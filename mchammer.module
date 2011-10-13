@@ -1,5 +1,344 @@
 <?php
 /*
  * @file
- * 
+ *
  */
+
+
+/**
+ * Implements hook_entity_info().
+ */
+function mchammer_entity_info() {
+  $return['mail_template'] = array(
+    'label' => t('Mail template'),
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'entity class' => 'MailTemplateEntity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'mchammer_templates',
+    'fieldable' => FALSE,
+    'entity keys' => array(
+      'id' => 'mtid',
+      'bundle' => 'mail_template',
+    ),
+    'module' => 'mchammer',
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+       ),
+    ),
+    'access callback' => 'mail_template_access',
+    'metadata controller class' => 'MailTemplateMetadataController'
+  );
+  return $return;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function mchammer_permission() {
+  return array(
+    'administer mail templates' =>  array(
+      'title' => t('Administer mail templates'),
+      'description' => t('Add and edit mail templates.'),
+    ),
+  );
+}
+
+/**
+ * Determines whether the given user has access to a mail.
+ */
+function mail_template_access($op, FieldCollectionItemEntity $item = NULL, $account = NULL) {
+  if (user_access('administer mail templates', $account)) {
+    return TRUE;
+  }
+}
+
+/**
+ * Loads a field-collection item.
+ *
+ * @return field_collection_item
+ *   The field_collection_item object or FALSE.
+ */
+function mail_template_load($item_id) {
+  $result = entity_load('mail_template', array($item_id));
+  return $result ? reset($result) : FALSE;
+}
+
+
+
+
+/**
+ * Class for Mail Template entities.
+ */
+class MailTemplateEntity extends Entity {
+
+  protected $fieldInfo, $hostEntity, $hostEntityId, $hostEntityType;
+  protected $langcode;
+
+  public $item_id, $field_name;
+
+  public function __construct(array $values = array(), $entityType = NULL) {
+    parent::__construct($values, 'field_collection_item');
+    $field_info = $this->fieldInfo();
+    if (!$field_info || $field_info['type'] != 'field_collection') {
+      throw new Exception("Invalid field name given.");
+    }
+  }
+
+  /**
+   * Provides info about the field on the host entity, which embeds this
+   * field-collection item.
+   */
+  public function fieldInfo() {
+    return field_info_field($this->field_name);
+  }
+
+  /**
+   * Provides info of the field instance containing the reference to this
+   * field-collection item.
+   */
+  public function instanceInfo() {
+    if ($this->fetchHostDetails()) {
+      return field_info_instance($this->hostEntityType(), $this->field_name, $this->hostEntityBundle());
+    }
+  }
+
+  /**
+   * Specifies the default label, which is picked up by label() by default.
+   */
+  public function defaultLabel() {
+    // @todo make configurable.
+    if ($instance = $this->instanceInfo()) {
+      $field = $this->fieldInfo();
+      if ($field['cardinality'] == 1) {
+        return $instance['label'];
+      }
+      elseif ($this->item_id) {
+        return t('!instance_label @count', array('!instance_label' => $instance['label'], '@count' => $this->delta() + 1));
+      }
+      else {
+        return t('New !instance_label', array('!instance_label' => $instance['label']));
+      }
+    }
+    return t('Unconnected field-collection item');
+  }
+
+  /**
+   * Returns the path used to view the entity.
+   */
+  public function path() {
+    if ($this->item_id) {
+      return field_collection_field_get_path($this->fieldInfo()) . '/' . $this->item_id;
+    }
+  }
+
+  /**
+   * Returns the URI as returned by entity_uri().
+   */
+  public function defaultUri() {
+    return array(
+      'path' => $this->path(),
+    );
+  }
+
+  /**
+   * Sets the host entity. Only possible during creation of a item.
+   *
+   * @param $create_link
+   *   (optional) Whether a field-item linking the host entity to the field
+   *   collection item should be created.
+   */
+  public function setHostEntity($entity_type, $entity, $langcode = LANGUAGE_NONE, $create_link = TRUE) {
+    if (!empty($this->is_new)) {
+      $this->hostEntityType = $entity_type;;
+      $this->hostEntity = $entity;
+      $this->langcode = LANGUAGE_NONE;
+      list($this->hostEntityId) = entity_extract_ids($this->hostEntityType, $this->hostEntity);
+      // If the host entity is not saved yet, set the id to FALSE. So
+      // fetchHostDetails() does not try to load the host entity details.
+      if (!isset($this->hostEntityId)) {
+        $this->hostEntityId = FALSE;
+      }
+      if ($create_link) {
+        $entity->{$this->field_name}[$this->langcode][] = array('entity' => $this);
+      }
+    }
+    else {
+      throw new Exception('The host entity may be set only during creation of a field-collection item.');
+    }
+  }
+
+  /**
+   * Returns the host entity, which embeds this field-collection item.
+   */
+  public function hostEntity() {
+    if ($this->fetchHostDetails()) {
+      if (!isset($this->hostEntity)) {
+        $result = entity_load($this->hostEntityType, array($this->hostEntityId));
+        $this->hostEntity = reset($result);
+      }
+      return $this->hostEntity;
+    }
+  }
+
+  /**
+   * Returns the entity type of the host entity, which embeds this
+   * field-collection item.
+   */
+  public function hostEntityType() {
+    if ($this->fetchHostDetails()) {
+      return $this->hostEntityType;
+    }
+  }
+
+  /**
+   * Returns the id of the host entity, which embeds this field-collection item.
+   */
+  public function hostEntityId() {
+    if ($this->fetchHostDetails()) {
+      return $this->hostEntityId;
+    }
+  }
+
+  /**
+   * Returns the bundle of the host entity, which embeds this field-collection
+   * item.
+   */
+  public function hostEntityBundle() {
+    if ($entity = $this->hostEntity()) {
+      list($id, $rev_id, $bundle) = entity_extract_ids($this->hostEntityType, $entity);
+      return $bundle;
+    }
+  }
+
+  protected function fetchHostDetails() {
+    if (!isset($this->hostEntityId)) {
+      if ($this->item_id) {
+        // For saved field-collections, query the field data to determine the
+        // right host entity.
+        $query = new EntityFieldQuery();
+        $query->fieldCondition($this->fieldInfo(), 'value', $this->item_id);
+        $result = $query->execute();
+        list($this->hostEntityType, $data) = each($result);
+        $this->hostEntityId = $data ? key($data) : FALSE;
+      }
+      else {
+        // No host entity available yet.
+        $this->hostEntityId = FALSE;
+      }
+    }
+    return !empty($this->hostEntityId) || !empty($this->hostEntity);
+  }
+
+  /**
+   * Determines the $delta of the reference pointing to this field-collection
+   * item.
+   */
+  public function delta() {
+    if (($entity = $this->hostEntity()) && isset($entity->{$this->field_name})) {
+      foreach ($entity->{$this->field_name} as $lang => &$data) {
+        foreach ($data as $delta => $item) {
+          if (isset($item['value']) && $item['value'] == $this->item_id) {
+            return $delta;
+          }
+          elseif (isset($item['entity']) && $item['entity'] === $this) {
+            return $delta;
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Save the field-collection item.
+   *
+   * During creation a host entity has to be specified via the setHostEntity()
+   * before this function is invoked. For the link between the entities to be
+   * fully established, the host entity object is updated automatically to
+   * include a reference on this field-collection item durign saving.
+   *
+   * @param $skip_host_save
+   *   (internal) If TRUE is passed, the host entity is not saved automatically
+   *   and therefore no link is created between the host and the item.
+   */
+  public function save($skip_host_save = FALSE) {
+    $transaction = db_transaction();
+    try {
+      // Make sure we have a host entity during creation.
+      if (!empty($this->is_new) && !(isset($this->hostEntityId) || isset($this->hostEntity))) {
+        throw new Exception("Unable to create a field-collection item without a given host entity.");
+      }
+      $is_new = !empty($this->is_new);
+      $return = entity_get_controller($this->entityType)->save($this, $transaction);
+
+      // Create / update the link to the host entity.
+      $host_entity = $this->hostEntity();
+      if ($is_new && !$skip_host_save) {
+        $delta = $this->delta();
+        if (isset($delta)) {
+          $host_entity->{$this->field_name}[$this->langcode][$delta] = array('value' => $this->item_id);
+        }
+        else {
+          $host_entity->{$this->field_name}[$this->langcode][] = array('value' => $this->item_id);
+        }
+      }
+      // Always save the host entity, so modules are able to react upon changes
+      // to the content of the host and any 'last updated' dates of entities get
+      // updated.
+      if (!$skip_host_save) {
+        entity_save($this->hostEntityType, $host_entity);
+      }
+      return $return;
+    }
+    catch (Exception $e) {
+      $transaction->rollback($this->entityType, $e->getMessage(), array(), WATCHDOG_ERROR);
+      return FALSE;
+    }
+  }
+
+  /**
+   * Delete the field-collection item.
+   */
+  public function delete() {
+    parent::delete();
+    // Delete the reference of the host entity.
+    if ($this->item_id && $entity = $this->hostEntity()) {
+      foreach ($entity->{$this->field_name} as $lang => &$data) {
+        foreach ($data as $delta => $item) {
+          if ($item['value'] == $this->item_id) {
+            unset($data[$delta]);
+          }
+        }
+      }
+      entity_save($this->hostEntityType(), $entity);
+    }
+  }
+
+  /**
+   * Magic method to only serialize what's necessary.
+   */
+  public function __sleep() {
+    $vars = get_object_vars($this);
+    unset($vars['entityInfo'], $vars['idKey'], $vars['nameKey'], $vars['statusKey']);
+    unset($vars['fieldInfo']);
+    // Also do not serialize the host entity, but only if it has already an id.
+    if ($this->hostEntity && $this->hostEntityId) {
+      unset($vars['hostEntity']);
+    }
+
+    // Also key the returned array with the variable names so the method may
+    // be easily overridden and customized.
+    return drupal_map_assoc(array_keys($vars));
+  }
+
+  /**
+   * Magic method to invoke setUp() on unserialization.
+   *
+   * @todo: Remove this once it appears in a released entity API module version.
+   */
+  public function __wakeup() {
+    $this->setUp();
+  }
+}
