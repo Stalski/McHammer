@@ -4,4 +4,6 @@
  *
  */
 
-function mchammer_
+function mchammer_schema() {
+
+}

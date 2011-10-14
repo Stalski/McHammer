@@ -10,7 +10,7 @@
 function mchammer_menu() {
 
   $items = array();
-  $items[] = array(
+  $items[''] = array(
   );
 
 }
