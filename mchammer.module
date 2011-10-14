@@ -5,6 +5,17 @@
  */
 
 /**
+ * Implements hook_menu().
+ */
+function mchammer_menu() {
+
+  $items = array();
+  $items[] = array(
+  );
+
+}
+
+/**
  * Implements hook_entity_info().
  */
 function mchammer_entity_info() {
