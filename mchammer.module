@@ -11,31 +11,42 @@ function mchammer_menu() {
 
   $items = array();
 
-  // Avoid repetition.
-  $base = array(
-    'access callback' => 'mchammer_edit_mail_template',
-    'access arguments' => array(1),
-    'page arguments' => array(1),
-    'type' => MENU_LOCAL_TASK,
+  $items['mail-template'] = array(
+    'title' => 'Panel list',
+    'access arguments' => array('administer mail templates'),
+    'page callback' => 'mchammer_list_templates',
+    'file' => 'includes/admin.inc',
+    'weight' => 1,
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['mail-template/add'] = array(
+    'title' => 'Add template',
+    'access arguments' => array('administer mail templates'),
+    'page callback' => 'mchammer_add_template',
+    'file' => 'includes/admin.inc',
+    'type' => MENU_CALLBACK,
   );
 
   $items['mail-template/%mail_template/panel_layout'] = array(
     'title' => 'Panel layout',
     'page callback' => 'mchammer_edit_layout',
+    'page arguments' => array(1),
+    'access arguments' => array('administer mail templates'),
+    'page callback' => 'mchammer_edit_layout',
+    'file' => 'includes/admin.inc',
+    'type' => MENU_LOCAL_TASK,
     'weight' => 2,
-  ) + $base;
+  );
 
   $items['mail-template/%mail_template/panel_content'] = array(
     'title' => 'Panel content',
     'page callback' => 'mchammer_edit_content',
+    'page arguments' => array(1),
+    'access arguments' => array('administer mail templates'),
+    'file' => 'includes/admin.inc',
+    'type' => MENU_LOCAL_TASK,
     'weight' => 3,
-  ) + $base;
-
-  $items['mail-template/add/panel/choose-layout'] = array(
-    'title' => 'Choose layout',
-    'access arguments' => array('create panel-mail-templates'),
-    'page callback' => 'mchammer_add_panel',
-    'type' => MENU_CALLBACK,
   );
 
 }
@@ -72,14 +83,6 @@ function mchammer_permission() {
       'title' => t('Administer mail templates'),
       'description' => t('Add and edit mail templates.'),
     ),
-    'administer panel-mail-templates' => array(
-      'title' => t('Administer panel mail templates'),
-      'description' => t('Full administrative access to panel mail templates including create, update and delete all'),
-    ),
-    'edit any panel-mail-templates' => array(
-      'title' => t('Edit any panel-mail-templates'),
-      'description' => t('Edit all pre-existing panel mail templates regardless of ownership.'),
-    ),
   );
 }
 
@@ -88,58 +91,6 @@ function mchammer_permission() {
  */
 function mail_template_access() {
   return user_access('administer mail templates');
-}
-
-/**
- * Access callback to determine if a user has edit access.
- */
-function panels_node_edit_node($mail_template) {
-  if (!isset($mail_template->panels_mail_template)) {
-    return FALSE;
-  }
-
-  return user_access('edit any panel-mail-templates');
-}
-
-/**
- * Override of node add page to force layout selection prior
- * to actually editing a node.
- */
-function mchammer_add_panel() {
-  $output = '';
-
-  ctools_include('plugins', 'panels');
-  ctools_include('common', 'panels');
-
-  $layouts = panels_common_get_allowed_layouts('mail_template');
-  return panels_common_print_layout_links($layouts, 'mail-template/add/panel', array('query' => $_GET));
-}
-
-// ---------------------------------------------------------------------------
-// Meat of the Panels API; almost completely passing through to panels.module
-
-/**
- * Pass through to the panels layout editor.
- */
-function mchammer_edit_layout($mail_template) {
-//  ctools_include('plugins', 'panels');
-  ctools_include('context');
-  $display = panels_load_display($mail_template->panels_mail_template['did']);
-  $display->context = mchammer_get_context($mail_template);
-  return panels_edit_layout($display, t('Save'), "mail-template/$mail_template->mtid/panel_layout", 'panels_node');
-}
-
-/**
- * Pass through to the panels content editor.
- */
-function mchammer_edit_content($mail_template) {
-  ctools_include('context');
-  $display = panels_load_display($mail_template->panels_mail_template['did']);
-  $display->context = mchammer_get_context($mail_template);
-  ctools_include('common', 'panels');
-  $content_types = panels_common_get_allowed_types('mchammer', $display->context);
-
-  return panels_edit($display, "mail-template/$mail_template->mtid/panel_content", $content_types);
 }
 
 /**
