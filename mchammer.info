@@ -2,6 +2,9 @@ name = McHammer
 description = McHammer is a template based mail composing tool to create dynamic and custom content for newsletters, which can be scheduled.
 core = 7.x
 
+files[] = includes/mailtemplateentity.inc
+files[] = includes/mail_template.info.inc
+
 dependencies[] = ctools
 dependencies[] = entity
 dependencies[] = panels
