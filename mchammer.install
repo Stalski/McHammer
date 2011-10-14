@@ -10,11 +10,37 @@
 function mchammer_schema() {
 
   $schema['mchammer_mail_templates'] = array(
+    // CTools export definitions.
+    'export' => array(
+      'key' => 'machine_name',
+      'key name' => 'Mail Template machine name',
+      'primary key' => 'mtid',
+      'bulk export' => TRUE,
+      'identifier' => 'mail_template',
+      //'object' => 'HeartbeatMessageTemplate',
+      'default hook' => 'mchammer_mail_template_info',
+      'list callback' => 'mchammer_mail_template_names',
+      //'delete callback' => 'mchammer_mail_template_delete',
+      //'export callback' => 'heartbeat_message_template_export',
+      'can disable' => TRUE,
+      'api' => array(
+        'owner' => 'mchammer',
+        'api' => 'mchammer',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
     'fields' => array(
       'mtid' => array(
         'type' => 'serial',
         'not null' => TRUE,
         'description' => 'The internal identifier for a mail template.',
+      ),
+      'machine_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The machine readable name of the mail template.',
       ),
       'title' => array(
         'type' => 'varchar',

@@ -11,27 +11,31 @@ function mchammer_menu() {
 
   $items = array();
 
-  $items['mail-template'] = array(
-    'title' => 'Panel list',
+  $items['admin/structure/mchammer'] = array(
+    'title' => 'MC HAMMER dashboard',
     'access arguments' => array('administer mail templates'),
-    'page callback' => 'mchammer_list_templates',
-    'file' => 'includes/admin.inc',
+    'page callback' => 'system_admin_menu_block_page',
+    'position' => 'left',
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
     'weight' => 1,
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['mail-template/add'] = array(
+  // List is taken over by CTools.
+
+  $items['admin/structure/mchammer/mail-template/add'] = array(
     'title' => 'Add template',
     'access arguments' => array('administer mail templates'),
     'page callback' => 'mchammer_add_template',
     'file' => 'includes/admin.inc',
-    'type' => MENU_CALLBACK,
+    'type' => MENU_LOCAL_TASK,
   );
 
-  $items['mail-template/%mail_template/panel_layout'] = array(
+  $items['admin/structure/mchammer/mail-template/%mail_template/panel_layout'] = array(
     'title' => 'Panel layout',
     'page callback' => 'mchammer_edit_layout',
-    'page arguments' => array(1),
+    'page arguments' => array(3),
     'access arguments' => array('administer mail templates'),
     'page callback' => 'mchammer_edit_layout',
     'file' => 'includes/admin.inc',
@@ -39,15 +43,41 @@ function mchammer_menu() {
     'weight' => 2,
   );
 
-  $items['mail-template/%mail_template/panel_content'] = array(
+  $items['admin/structure/mchammer/mail-template/%mail_template/panel_content'] = array(
     'title' => 'Panel content',
     'page callback' => 'mchammer_edit_content',
-    'page arguments' => array(1),
+    'page arguments' => array(3),
     'access arguments' => array('administer mail templates'),
     'file' => 'includes/admin.inc',
     'type' => MENU_LOCAL_TASK,
     'weight' => 3,
   );
+
+  return $items;
+
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mchammer_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'ctools' && $plugin == 'export_ui') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * List callback to show templates through CTools.
+ */
+function mchammer_mail_template_names() {
+
+  $names = array();
+  ctools_include('export');
+  foreach(ctools_export_crud_load_all('mchammer_mail_templates') as $template) {
+    $names[$template->mtid] = $template->title;
+  }
+
+  return $names;
 
 }
 
@@ -91,6 +121,27 @@ function mchammer_permission() {
  */
 function mail_template_access() {
   return user_access('administer mail templates');
+}
+
+/**
+ * Form function for the McHammer mail templates.
+ */
+function mchammer_ctools_export_ui_form(&$form, & $form_state) {
+  //
+}
+
+/**
+ * Form validate function for the McHammer mail templates.
+ */
+function mchammer_ctools_export_ui_form_validate(&$form, & $form_state) {
+  //
+}
+
+/**
+ * Form submit function for the McHammer mail templates.
+ */
+function mchammer_ctools_export_ui_form_submit(&$form, & $form_state) {
+  //
 }
 
 /**
