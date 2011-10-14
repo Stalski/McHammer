@@ -17,9 +17,9 @@ function mchammer_schema() {
       'primary key' => 'mtid',
       'bulk export' => TRUE,
       'identifier' => 'mail_template',
-      //'object' => 'HeartbeatMessageTemplate',
       'default hook' => 'mchammer_mail_template_info',
       'list callback' => 'mchammer_mail_template_names',
+      'save callback' => 'mchammer_mail_template_save',
       //'delete callback' => 'mchammer_mail_template_delete',
       //'export callback' => 'heartbeat_message_template_export',
       'can disable' => TRUE,
@@ -62,7 +62,7 @@ function mchammer_schema() {
     ),
     'primary key' => array('mtid'),
     'unique keys' => array(
-      'title' => array('title'),
+      'machine_name' => array('machine_name'),
     ),
   );
 

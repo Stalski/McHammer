@@ -16,13 +16,24 @@ function mchammer_list_templates() {
  * to actually editing a node.
  */
 function mchammer_add_template() {
+
+  $panel_layout = arg(5);
   $output = '';
+
+  $layout = panels_get_layout($panel_layout);
+  if (empty($layout)) {
+    return drupal_not_found();
+  }
+  $form['panels_node']['layout'] = array(
+    '#type' => 'value',
+    '#value' => $panel_layout,
+  );
 
   ctools_include('plugins', 'panels');
   ctools_include('common', 'panels');
 
   $layouts = panels_common_get_allowed_layouts('mail_template');
-  return panels_common_print_layout_links($layouts, 'admin/structure/mchammer/mail-template/add/panel', array('query' => $_GET));
+  return panels_common_print_layout_links($layouts, 'admin/structure/mchammer/mail-template/add', array('query' => $_GET));
 }
 
 // ---------------------------------------------------------------------------

@@ -124,27 +124,6 @@ function mail_template_access() {
 }
 
 /**
- * Form function for the McHammer mail templates.
- */
-function mchammer_ctools_export_ui_form(&$form, & $form_state) {
-  //
-}
-
-/**
- * Form validate function for the McHammer mail templates.
- */
-function mchammer_ctools_export_ui_form_validate(&$form, & $form_state) {
-  //
-}
-
-/**
- * Form submit function for the McHammer mail templates.
- */
-function mchammer_ctools_export_ui_form_submit(&$form, & $form_state) {
-  //
-}
-
-/**
  * Load multiple mail templates from the database.
  *
  * This function should be used whenever you need to load more than one entity
@@ -174,4 +153,21 @@ function mail_template_load_multiple($ids = array(), $conditions = array()) {
 function mail_template_load($item_id) {
   $result = mail_template_load_multiple(array($item_id));
   return $result ? reset($result) : FALSE;
+}
+
+/**
+ * Write a mini panel to the database.
+ */
+function mchammer_mail_template_save(&$mail_template) {
+
+  if (!empty($mail_template->display)) {
+    $display = panels_save_display($mail_template->display);
+    $mail_template->did = $display->did;
+  }
+
+  $update = (isset($mail_template->mtid) && $mail_template->mtid != 'new') ? array('mtid') : array();
+  drupal_write_record('mchammer_mail_templates', $mail_template, $update);
+
+  return $mail_template;
+
 }

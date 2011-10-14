@@ -22,15 +22,17 @@ $plugin = array(
   'title plural' => t('Mail templates'),
   'title plural proper' => t('Mail templates'),
 
-  // All callbacks will accept &$form and &$form_state as arguments.
-  'form' => array(
-    'settings' => 'mchammer_ctools_export_ui_form',
-    'validate' => 'mchammer_ctools_export_ui_form_validate',
-    'submit' => 'mchammer_ctools_export_ui_form_submit',
+  'use wizard' => TRUE,
+  'form info' => array(
+    'order' => array(
+      'basic' => t('Settings'),
+      'layout' => t('Layout'),
+      'content' => t('Content'),
+    ),
   ),
 
   'handler' => array(
-    'class' => 'ctools_export_ui_mail_template',
+    'class' => 'mchammer_mail_template_ui',
     'parent' => 'ctools_export_ui',
   ),
 
