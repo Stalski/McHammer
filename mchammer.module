@@ -4,68 +4,34 @@
  *
  */
 
-
 /**
  * Implements hook_entity_info().
  */
-//function mchammer_entity_info() {
-//  $return['mail_template'] = array(
-//    'label' => t('Mail template'),
-//    'label callback' => 'entity_class_label',
-//    'uri callback' => 'entity_class_uri',
-//    'entity class' => 'MailTemplateEntity',
-//    'controller class' => 'EntityAPIController',
-//    'base table' => 'mchammer_templates',
-//    'fieldable' => FALSE,
-//    'entity keys' => array(
-//      'id' => 'mtid',
-//      'bundle' => 'mail_template',
-//    ),
-//    'module' => 'mchammer',
-//    'view modes' => array(
-//      'full' => array(
-//        'label' => t('Full content'),
-//        'custom settings' => FALSE,
-//       ),
-//    ),
-//    'access callback' => 'mail_template_access',
-//    'metadata controller class' => 'MailTemplateMetadataController'
-//  );
-//  return $return;
-//}
-
-/**
- * Implements entity_crud_hook_entity_info().
- */
-function entity_crud_mchammer_entity_info() {
-  $return = array(
-    'mail_template' => array(
-      'label' => t('Mail template'),
-      'entity class' => 'MailTemplateEntity',
-      'controller class' => 'EntityAPIController',
-      'base table' => 'mchammer_templates',
-      'module' => 'mchammer',
-      'fieldable' => FALSE,
-      'entity keys' => array(
-        'id' => 'mtid',
-        'bundle' => 'type',
-      ),
-      'bundles' => array(),
+function mchammer_entity_info() {
+  $return['mail_template'] = array(
+    'label' => t('Mail template'),
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'entity class' => 'MailTemplateEntity',
+    'controller class' => 'EntityAPIController',
+    'base table' => 'mchammer_templates',
+    'fieldable' => FALSE,
+    'module' => 'mchammer',
+    'entity keys' => array(
+      'id' => 'mtid',
+      'bundle' => 'type',
     ),
+    'module' => 'mchammer',
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full content'),
+        'custom settings' => FALSE,
+       ),
+    ),
+    'access callback' => 'mail_template_access',
+    'metadata controller class' => 'MailTemplateMetadataController'
   );
   return $return;
-}
-
-/**
- * Implements entity_metadata_hook_entity_info().
- */
-function entity_metadata_mchammer_entity_info() {
-  return array(
-    'mail_template' => array(
-      'label' => t('Mail template'),
-      'access callback' => 'mail_template_access',
-    ),
-  );
 }
 
 /**
