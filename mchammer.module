@@ -8,45 +8,23 @@
  * Implements hook_entity_info().
  */
 function mchammer_entity_info() {
+
   $return['mail_template'] = array(
     'label' => t('Mail template'),
     'label callback' => 'entity_class_label',
-    'uri callback' => 'entity_class_uri',
     'entity class' => 'MailTemplateEntity',
-    'controller class' => 'EntityAPIController',
+    'controller class' => 'MailTemplateEntityController',
     'base table' => 'mchammer_templates',
     'fieldable' => FALSE,
-    'module' => 'mchammer',
     'entity keys' => array(
       'id' => 'mtid',
-      'bundle' => 'type',
-    ),
-    'module' => 'mchammer',
-    'view modes' => array(
-      'full' => array(
-        'label' => t('Full content'),
-        'custom settings' => FALSE,
-       ),
+      'title' => 'title',
     ),
     'access callback' => 'mail_template_access',
-    'metadata controller class' => 'MailTemplateMetadataController'
   );
+
   return $return;
-}
 
-/**
- * Implements hook_entity_property_info().
- */
-function mchammer_entity_property_info(&$info) {
-  $info = array();
-  $properties = &$info['mail_template']['properties'];
-
-  $properties['mtid'] = array(
-    'label' => t("Mail template ID"),
-    'type' => 'integer',
-    'description' => t("The unique mail template ID."),
-  );
-  return $info;
 }
 
 /**
@@ -69,12 +47,33 @@ function mail_template_access() {
 }
 
 /**
- * Loads a field-collection item.
+ * Load multiple mail templates from the database.
  *
- * @return field_collection_item
- *   The field_collection_item object or FALSE.
+ * This function should be used whenever you need to load more than one entity
+ * from the database. The entities are loaded into memory and will not require
+ * database access if loaded again during the same page request.
+ *
+ * @see hook_entity_info()
+ * @see RulesEntityController
+ *
+ * @param $ids
+ *   An array of mail template ids.
+ * @param $conditions
+ *   An array of conditions in the form 'field' => $value.
+ *
+ * @return
+ *   An array of mail templates indexed by their ids.
+ */
+function mail_template_load_multiple($ids = array(), $conditions = array()) {
+  return entity_load('mail_template', $ids, $conditions);
+}
+
+/**
+ * Loads a mail template.
+ *
+ * @return The mail_template entity or FALSE.
  */
 function mail_template_load($item_id) {
-  $result = entity_load('mail_template', array($item_id));
+  $result = mail_template_load_multiple(array($item_id));
   return $result ? reset($result) : FALSE;
 }
