@@ -23,35 +23,35 @@ function mchammer_menu() {
   );
 
   // List is taken over by CTools.
-
-  $items['admin/structure/mchammer/mail-template/add'] = array(
-    'title' => 'Add template',
-    'access arguments' => array('administer mail templates'),
-    'page callback' => 'mchammer_add_template',
-    'file' => 'includes/admin.inc',
-    'type' => MENU_LOCAL_TASK,
-  );
-
-  $items['admin/structure/mchammer/mail-template/%mail_template/panel_layout'] = array(
-    'title' => 'Panel layout',
-    'page callback' => 'mchammer_edit_layout',
-    'page arguments' => array(3),
-    'access arguments' => array('administer mail templates'),
-    'page callback' => 'mchammer_edit_layout',
-    'file' => 'includes/admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 2,
-  );
-
-  $items['admin/structure/mchammer/mail-template/%mail_template/panel_content'] = array(
-    'title' => 'Panel content',
-    'page callback' => 'mchammer_edit_content',
-    'page arguments' => array(3),
-    'access arguments' => array('administer mail templates'),
-    'file' => 'includes/admin.inc',
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 3,
-  );
+//
+//  $items['admin/structure/mchammer/mail-template/add'] = array(
+//    'title' => 'Add template',
+//    'access arguments' => array('administer mail templates'),
+//    'page callback' => 'mchammer_add_template',
+//    'file' => 'includes/admin.inc',
+//    'type' => MENU_LOCAL_TASK,
+//  );
+//
+//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_layout'] = array(
+//    'title' => 'Panel layout',
+//    'page callback' => 'mchammer_edit_layout',
+//    'page arguments' => array(3),
+//    'access arguments' => array('administer mail templates'),
+//    'page callback' => 'mchammer_edit_layout',
+//    'file' => 'includes/admin.inc',
+//    'type' => MENU_LOCAL_TASK,
+//    'weight' => 2,
+//  );
+//
+//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_content'] = array(
+//    'title' => 'Panel content',
+//    'page callback' => 'mchammer_edit_content',
+//    'page arguments' => array(3),
+//    'access arguments' => array('administer mail templates'),
+//    'file' => 'includes/admin.inc',
+//    'type' => MENU_LOCAL_TASK,
+//    'weight' => 3,
+//  );
 
   return $items;
 
