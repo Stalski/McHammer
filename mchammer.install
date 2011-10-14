@@ -4,6 +4,42 @@
  *
  */
 
+/**
+ * Implements hook_schema().
+ */
 function mchammer_schema() {
+
+  $schema['mchammer_mail_templates'] = array(
+    'fields' => array(
+      'mtid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'The internal identifier for a mail template.',
+      ),
+      'title' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The title of the mail template.',
+      ),
+      'module' => array(
+        'description' => 'The name of the providing module if the entity has been defined in code.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+      ),
+      'did' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The panels display id from this template',
+      ),
+    ),
+    'primary key' => array('mtid'),
+    'unique keys' => array(
+      'title' => array('title'),
+    ),
+  );
+
+  return $schema;
 
 }

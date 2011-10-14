@@ -50,7 +50,7 @@ function mchammer_entity_info() {
     'label callback' => 'entity_class_label',
     'entity class' => 'MailTemplateEntity',
     'controller class' => 'MailTemplateEntityController',
-    'base table' => 'mchammer_templates',
+    'base table' => 'mchammer_mail_templates',
     'fieldable' => FALSE,
     'entity keys' => array(
       'id' => 'mtid',
