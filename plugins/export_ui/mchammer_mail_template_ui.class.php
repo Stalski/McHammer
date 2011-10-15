@@ -8,7 +8,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
 
   function edit_form(&$form, &$form_state) {
 
-    // Get the basic edit form
+    // Get the basic edit form.
     parent::edit_form($form, $form_state);
 
     $form['title'] = array(
@@ -26,14 +26,14 @@ class mchammer_mail_template_ui extends ctools_export_ui {
    * Step 2 of wizard: Choose a layout.
    */
   function edit_form_layout(&$form, &$form_state) {
-
+dsm($form_state);
     ctools_include('common', 'panels');
     ctools_include('display-layout', 'panels');
     ctools_include('plugins', 'panels');
 
     // @todo -- figure out where/how to deal with this.
     $form_state['allowed_layouts'] = 'mchammer_mail_template';
-dsm($form_state);
+
     if ($form_state['op'] == 'add' && empty($form_state['item']->display)) {
       $form_state['item']->display = panels_new_display();
     }
@@ -51,6 +51,38 @@ dsm($form_state);
       $form['buttons']['next']['#value'] = t('Change');
     }
 
+  }
+
+  /**
+   * Validate that a layout was chosen.
+   */
+  function edit_form_layout_validate(&$form, &$form_state) {
+    $display = &$form_state['display'];
+    if (empty($form_state['values']['layout'])) {
+      form_error($form['layout'], t('You must select a layout.'));
+    }
+    if ($form_state['op'] == 'edit') {
+      if ($form_state['values']['layout'] == $display->layout) {
+        form_error($form['layout'], t('You must select a different layout if you wish to change layouts.'));
+      }
+    }
+  }
+
+  /**
+   * A layout has been selected, set it up.
+   */
+  function edit_form_layout_submit(&$form, &$form_state) {
+    dsm($form_state);
+    $display = &$form_state['display'];
+    if ($form_state['op'] == 'edit') {
+      if ($form_state['values']['layout'] != $display->layout) {
+        $form_state['item']->temp_layout = $form_state['values']['layout'];
+        $form_state['clicked_button']['#next'] = 'move';
+      }
+    }
+    else {
+      $form_state['item']->display->layout = $form_state['values']['layout'];
+    }
   }
 
   /**
