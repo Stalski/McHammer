@@ -26,7 +26,6 @@ class mchammer_mail_template_ui extends ctools_export_ui {
    * Step 2 of wizard: Choose a layout.
    */
   function edit_form_layout(&$form, &$form_state) {
-dsm($form_state);
     ctools_include('common', 'panels');
     ctools_include('display-layout', 'panels');
     ctools_include('plugins', 'panels');
@@ -72,7 +71,6 @@ dsm($form_state);
    * A layout has been selected, set it up.
    */
   function edit_form_layout_submit(&$form, &$form_state) {
-    dsm($form_state);
     $display = &$form_state['display'];
     if ($form_state['op'] == 'edit') {
       if ($form_state['values']['layout'] != $display->layout) {
@@ -101,7 +99,8 @@ dsm($form_state);
       $this->edit_cache_set($form_state['item'], 'clone');
     }
 
-    $cache = panels_edit_cache_get('panels_mini:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
+    //$cache = panels_edit_cache_get('panels_mini:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
+    $cache = panels_edit_cache_get('mchammer:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
 
     $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
     $form_state['renderer']->cache = &$cache;

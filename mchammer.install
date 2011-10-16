@@ -25,7 +25,7 @@ function mchammer_schema() {
       'can disable' => TRUE,
       'api' => array(
         'owner' => 'mchammer',
-        'api' => 'mchammer',
+        'api' => 'panels_default',
         'minimum_version' => 1,
         'current_version' => 1,
       ),
