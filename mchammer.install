@@ -37,7 +37,7 @@ function mchammer_schema() {
         'not null' => TRUE,
         'description' => 'The internal identifier for a mail template.',
       ),
-      'name' => array(
+      'machine_name' => array(
         'type' => 'varchar',
         'length' => '255',
         'description' => 'The unique name of the newsletter template.',
