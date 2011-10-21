@@ -22,36 +22,14 @@ function mchammer_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  // List is taken over by CTools.
-//
-//  $items['admin/structure/mchammer/mail-template/add'] = array(
-//    'title' => 'Add template',
-//    'access arguments' => array('administer mail templates'),
-//    'page callback' => 'mchammer_add_template',
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//  );
-//
-//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_layout'] = array(
-//    'title' => 'Panel layout',
-//    'page callback' => 'mchammer_edit_layout',
-//    'page arguments' => array(3),
-//    'access arguments' => array('administer mail templates'),
-//    'page callback' => 'mchammer_edit_layout',
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//    'weight' => 2,
-//  );
-//
-//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_content'] = array(
-//    'title' => 'Panel content',
-//    'page callback' => 'mchammer_edit_content',
-//    'page arguments' => array(3),
-//    'access arguments' => array('administer mail templates'),
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//    'weight' => 3,
-//  );
+  $items['mchammer/%mchammer_mail_template'] = array(
+    'title' => 'Mail template',
+    'access arguments' => array('preview mail templates'),
+    'page callback' => 'mchammer_mail_template_page',
+    'page arguments' => array(1),
+    'file' => 'mchammer.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 
@@ -168,6 +146,10 @@ function mchammer_permission() {
     'administer mail templates' =>  array(
       'title' => t('Administer mail templates'),
       'description' => t('Add and edit mail templates.'),
+    ),
+    'preview mail templates' => array(
+      'title' => t('Preview mail templates'),
+      'description' => t('Preview mail templates')
     ),
   );
 }

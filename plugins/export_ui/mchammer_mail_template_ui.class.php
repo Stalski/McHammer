@@ -6,6 +6,14 @@
  */
 class mchammer_mail_template_ui extends ctools_export_ui {
 
+  function list_build_row($item, &$form_state, $operations) {
+    $operations['preview'] = array(
+      'href' => 'mchammer/' . $item->name,
+      'title' => t('Preview'),
+    );
+    parent::list_build_row($item, $form_state, $operations);
+  }
+
   function edit_form(&$form, &$form_state) {
 
     // Get the basic edit form

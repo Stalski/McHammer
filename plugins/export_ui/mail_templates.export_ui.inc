@@ -4,7 +4,6 @@ $plugin = array(
   'schema' => 'mchammer_mail_templates',
   'access' => 'administer mail templates',
 
-
   'menu' => array(
     'menu prefix' => 'admin/structure/mchammer', // default
     'menu item' => 'mail-template', // default
