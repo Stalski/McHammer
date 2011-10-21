@@ -121,7 +121,6 @@ class mchammer_mail_template_ui extends ctools_export_ui {
       $this->edit_cache_set($form_state['item'], 'clone');
     }
 
-    //$cache = panels_edit_cache_get('panels_mini:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
     $cache = panels_edit_cache_get('mchammer:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
 
     $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);

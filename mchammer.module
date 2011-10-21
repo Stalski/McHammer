@@ -31,6 +31,15 @@ function mchammer_menu() {
     'type' => MENU_CALLBACK,
   );
 
+  $items['mchammer/%mchammer_newsletter'] = array(
+    'title' => 'Newsletter',
+    'access arguments' => array('view all newsletters'),
+    'page callback' => 'mchammer_newsletter_page',
+    'page arguments' => array(1),
+    'file' => 'mchammer.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
   return $items;
 
 }
@@ -128,7 +137,8 @@ function mchammer_panels_cache_clear($key, $cache) {
 function mchammer_panels_cache_save($key, $cache) {
   list($handler, $item) = _mchammer_panels_cache_get($key);
   $item->display = $cache->display;
-  panels_mini_save($item);
+  dsm($item);
+  mchammer_mail_template_save($item);
   $handler->edit_cache_clear($item);
 }
 
@@ -151,6 +161,10 @@ function mchammer_permission() {
       'title' => t('Preview mail templates'),
       'description' => t('Preview mail templates')
     ),
+    'view all newsletters' => array(
+      'title' => t('View all newsletters'),
+      'description' => t('View all newsletters')
+    ),
   );
 }
 
@@ -162,17 +176,46 @@ function mail_template_access() {
 }
 
 /**
- * Load a mchammer mail template..
+ * Load a mchammer mail template.
  */
 function mchammer_mail_template_load($name) {
+  return mchammer_ctools_crud_load($name, 'mchammer_mail_templates');
+}
 
-  $cache = &drupal_static('mchammer_mail_templates', array());
+/**
+ * Write a McHammer mail template to the database.
+ */
+function mchammer_mail_template_save(&$mail_template) {
+  return mchammer_ctools_crud_save($mail_template, 'mchammer_mail_templates', 'mtid');
+}
+
+/**
+ * Load a mchammer newsletter.
+ */
+function mchammer_newsletter_load($name) {
+  return mchammer_ctools_crud_load($name, 'mchammer_newsletters');
+}
+
+/**
+ * Write a McHammer newsletter to the database.
+ */
+function mchammer_newsletter_save(&$mail_template) {
+  return mchammer_ctools_crud_save($mail_template, 'mchammer_newsletters', 'mnid');
+}
+
+/**
+ * Helper function to load a cached display of CTools export objects
+ * inside McHammer.
+ */
+function mchammer_ctools_crud_load($name, $table) {
+
+  $cache = &drupal_static($table, array());
 
   // We use array_key_exists because failed loads will be NULL and
   // isset() will try to load it again.
   if (!array_key_exists($name, $cache)) {
     ctools_include('export');
-    $result = ctools_export_load_object('mchammer_mail_templates', 'names', array($name));
+    $result = ctools_export_load_object($table, 'names', array($name));
     if (isset($result[$name])) {
       if (!empty($result[$name]->did)) {
         $result[$name]->display = panels_load_display($result[$name]->did);
@@ -197,18 +240,19 @@ function mchammer_mail_template_load($name) {
 }
 
 /**
- * Write a mini panel to the database.
+ * Helper function to save a cached display of CTools export objects
+ * inside McHammer.
  */
-function mchammer_mail_template_save(&$mail_template) {
+function mchammer_ctools_crud_save(&$object, $table, $id) {
 
-  if (!empty($mail_template->display)) {
-    $display = panels_save_display($mail_template->display);
-    $mail_template->did = $display->did;
+  if (!empty($object->display)) {
+    $display = panels_save_display($object->display);
+    $object->did = $display->did;
   }
 
-  $update = (isset($mail_template->mtid) && $mail_template->mtid != 'new') ? array('mtid') : array();
-  drupal_write_record('mchammer_mail_templates', $mail_template, $update);
+  $update = (isset($object->$id) && $object->$id != 'new') ? array($id) : array();
+  drupal_write_record($table, $object, $update);
 
-  return $mail_template;
+  return $object;
 
 }
