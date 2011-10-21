@@ -61,7 +61,7 @@ function mchammer_menu() {
  * Implements hook_ctools_plugin_directory().
  */
 function mchammer_ctools_plugin_directory($module, $plugin) {
-  if ($module == 'ctools' && $plugin == 'export_ui') {
+  if ($module == 'ctools' && ($plugin == 'export_ui' || $plugin == 'layouts')) {
     return 'plugins/' . $plugin;
   }
 }
