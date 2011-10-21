@@ -159,29 +159,6 @@ function mchammer_panels_cache_break_lock($key, $cache) {
 }
 
 /**
- * Implements hook_entity_info().
- */
-function mchammer_entity_info() {
-
-  $return['mail_template'] = array(
-    'label' => t('Mail template'),
-    'label callback' => 'entity_class_label',
-    'entity class' => 'MailTemplateEntity',
-    'controller class' => 'MailTemplateEntityController',
-    'base table' => 'mchammer_mail_templates',
-    'fieldable' => FALSE,
-    'entity keys' => array(
-      'id' => 'mtid',
-      'title' => 'title',
-    ),
-    'access callback' => 'mail_template_access',
-  );
-
-  return $return;
-
-}
-
-/**
  * Implements hook_permission().
  */
 function mchammer_permission() {
@@ -201,35 +178,11 @@ function mail_template_access() {
 }
 
 /**
- * Load multiple mail templates from the database.
- *
- * This function should be used whenever you need to load more than one entity
- * from the database. The entities are loaded into memory and will not require
- * database access if loaded again during the same page request.
- *
- * @see hook_entity_info()
- * @see RulesEntityController
- *
- * @param $ids
- *   An array of mail template ids.
- * @param $conditions
- *   An array of conditions in the form 'field' => $value.
- *
- * @return
- *   An array of mail templates indexed by their ids.
- */
-function mail_template_load_multiple($ids = array(), $conditions = array()) {
-  return entity_load('mail_template', $ids, $conditions);
-}
-
-/**
  * Loads a mail template.
  *
  * @return The mail_template entity or FALSE.
  */
-function mail_template_load($item_id) {
-  $result = mail_template_load_multiple(array($item_id));
-  return $result ? reset($result) : FALSE;
+function mail_template_load($machine_name) {
 }
 
 /**

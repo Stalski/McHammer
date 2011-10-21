@@ -8,6 +8,5 @@ files[] = includes/mail_template.info.inc
 files[] = plugins/export_ui/mchammer_mail_template_ui.class.php
 
 dependencies[] = ctools
-dependencies[] = entity
 dependencies[] = panels
 dependencies[] = ds
