@@ -26,6 +26,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
    * Step 2 of wizard: Choose a layout.
    */
   function edit_form_layout(&$form, &$form_state) {
+    dsm($form_state);
     ctools_include('common', 'panels');
     ctools_include('display-layout', 'panels');
     ctools_include('plugins', 'panels');
@@ -71,6 +72,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
    * A layout has been selected, set it up.
    */
   function edit_form_layout_submit(&$form, &$form_state) {
+    dsm($form_state['display']);
     $display = &$form_state['display'];
     if ($form_state['op'] == 'edit') {
       if ($form_state['values']['layout'] != $display->layout) {

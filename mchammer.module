@@ -100,7 +100,7 @@ function _mchammer_panels_cache_get($key) {
 }
 
 /**
- * Get display edit cache for the panels mini export UI
+ * Get display edit cache for the MCHammer mail templates export UI
  *
  * The key is the second half of the key in this form:
  * panels_mini:TASK_NAME:HANDLER_NAME;
@@ -129,34 +129,31 @@ function mchammer_panels_cache_get($key) {
  * Store a display edit in progress in the page cache.
  */
 function mchammer_panels_cache_set($key, $cache) {
-
   list($handler, $item) = _panels_mini_panels_cache_get($key);
   $item->mini_panels_display_cache = $cache;
   $handler->edit_cache_set_key($item, $key);
 }
 
 /**
- * Save all changes made to a display using the panels mini UI cache.
+ * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_clear($key, $cache) {
-
   list($handler, $item) = _panels_mini_panels_cache_get($key);
   $handler->edit_cache_clear($item);
 }
 
 /**
- * Save all changes made to a display using the panels mini UI cache.
+ * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_save($key, $cache) {
   list($handler, $item) = _panels_mini_panels_cache_get($key);
   $item->display = $cache->display;
   panels_mini_save($item);
-
   $handler->edit_cache_clear($item);
 }
 
 /**
- * Break the lock on a panels mini page.
+ * Break the lock on a panels MCHammer mail template.
  */
 function mchammer_panels_cache_break_lock($key, $cache) {
 }
