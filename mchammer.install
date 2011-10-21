@@ -17,9 +17,6 @@ function mchammer_schema() {
       'list callback' => 'mchammer_mail_templates_list',
       'save callback' => 'mchammer_mail_template_save',
       'load callback' => 'mchammer_mail_template_load',
-      //'delete callback' => 'mchammer_mail_template_delete',
-      //'export callback' => 'heartbeat_message_template_export',
-      'can disable' => TRUE,
       'api' => array(
         'owner' => 'mchammer',
         'api' => 'panels_default',

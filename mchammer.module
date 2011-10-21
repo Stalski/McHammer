@@ -62,7 +62,10 @@ function mchammer_menu() {
  */
 function mchammer_ctools_plugin_directory($module, $plugin) {
   if ($module == 'ctools' && ($plugin == 'export_ui' || $plugin == 'layouts')) {
-    return 'plugins/' . $plugin;
+    return "plugins/$plugin";
+  }
+  elseif ($module == 'panels' && !empty($plugin)) {
+    return "plugins/$plugin";
   }
 }
 
