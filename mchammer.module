@@ -117,7 +117,6 @@ function mchammer_panels_cache_get($key) {
 
   $cache = new stdClass();
   $cache->display = $item->display;
-  $cache->display->context = ctools_context_load_contexts($item);
   $cache->display->cache_key = 'mchammer:' . $key;
   $cache->content_types = panels_common_get_allowed_types('mchammer', $cache->display->context);
   $cache->display_title = TRUE;
