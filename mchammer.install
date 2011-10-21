@@ -17,6 +17,7 @@ function mchammer_schema() {
       'list callback' => 'mchammer_mail_templates_list',
       'save callback' => 'mchammer_mail_template_save',
       'load callback' => 'mchammer_mail_template_load',
+      'load all callback' => 'mchammer_mail_template_load_all',
       'api' => array(
         'owner' => 'mchammer',
         'api' => 'panels_default',

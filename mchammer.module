@@ -106,7 +106,7 @@ function _mchammer_panels_cache_get($key) {
  * Get display edit cache for the MCHammer mail templates export UI
  *
  * The key is the second half of the key in this form:
- * panels_mini:TASK_NAME:HANDLER_NAME;
+ * mchammer:TASK_NAME:HANDLER_NAME;
  */
 function mchammer_panels_cache_get($key) {
   ctools_include('common', 'panels');
@@ -213,6 +213,55 @@ function mchammer_mail_template_load($name) {
     return $cache[$name];
   }
 
+}
+
+/**
+ * Load all mini panels.
+ */
+function mchammer_mail_template_load_all($reset = FALSE) {
+  $cache = &drupal_static('mchammer_mail_templates', array());
+  static $all_loaded = FALSE;
+
+  // We check our own private static because individual minis could have
+  // been loaded prior to load all and we need to know that.
+  if (!$all_loaded || $reset) {
+    $all_loaded = TRUE;
+    if ($reset) {
+      $cache = array();
+    }
+
+    ctools_include('export');
+    $mail_templates = ctools_export_load_object('mchammer_mail_templates');
+    $dids = array();
+    foreach ($mail_templates as $mail_template) {
+      if (empty($cache[$mail_template->name])) {
+        if (!empty($mail_template->did)) {
+          $dids[$mail_template->did] = $mail_template->name;
+        }
+        else {
+        // Translate old style titles into new titles.
+          if (!empty($mail_template->title) && empty($mail_template->display->title)) {
+            $mail_template->display->title = $mail_template->title;
+          }
+        }
+        // Translate old style titles into new titles.
+        if (isset($mail_template->title) && empty($mail_template->admin_title)) {
+          $mail_template->admin_title = $mail_template->title;
+        }
+        $cache[$mail_template->name] = $mail_template;
+      }
+    }
+
+    $displays = panels_load_displays(array_keys($dids));
+    foreach ($displays as $did => $display) {
+      if (!empty($cache[$dids[$did]]->title) && empty($display->title)) {
+        $display->title = $cache[$dids[$did]]->title;
+      }
+      $cache[$dids[$did]]->display = $display;
+    }
+  }
+
+  return $cache;
 }
 
 /**
