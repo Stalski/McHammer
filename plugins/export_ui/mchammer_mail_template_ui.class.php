@@ -25,6 +25,16 @@ class mchammer_mail_template_ui extends ctools_export_ui {
   }
 
   /**
+   * Validate submission of the mini panel edit form.
+   */
+  function edit_form_basic_validate($form, &$form_state) {
+    parent::edit_form_validate($form, $form_state);
+    if (preg_match("/[^A-Za-z0-9 ]/", $form_state['values']['category'])) {
+      form_error($form['category'], t('Categories may contain only alphanumerics or spaces.'));
+    }
+  }
+
+  /**
    * Step 2 of wizard: Choose a layout.
    */
   function edit_form_layout(&$form, &$form_state) {
@@ -96,7 +106,6 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     ctools_include('ajax');
     ctools_include('plugins', 'panels');
     ctools_include('display-edit', 'panels');
-    ctools_include('context');
 
     // If we are cloning an item, we MUST have this cached for this to work,
     // so make sure:
