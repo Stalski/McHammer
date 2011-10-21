@@ -93,7 +93,7 @@ function _mchammer_panels_cache_get($key) {
  * Get display edit cache for the MCHammer mail templates export UI
  *
  * The key is the second half of the key in this form:
- * panels_mini:TASK_NAME:HANDLER_NAME;
+ * mchammer:TASK_NAME:HANDLER_NAME;
  */
 function mchammer_panels_cache_get($key) {
   ctools_include('common', 'panels');

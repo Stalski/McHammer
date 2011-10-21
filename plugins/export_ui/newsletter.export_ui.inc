@@ -16,7 +16,7 @@ $plugin = array(
   'title plural' => t('Newsletters'),
   'title plural proper' => t('Newsletters'),
 
-  'use wizard' => FALSE,
+  'use wizard' => TRUE,
   'form info' => array(
     'order' => array(
       'basic' => t('Settings'),
@@ -24,11 +24,11 @@ $plugin = array(
       'content' => t('Content'),
     ),
     // We have to add this form specially because it's invisible.
-//    'forms' => array(
-//      'move' => array(
-//        'form id' => 'ctools_export_ui_edit_item_wizard_form',
-//      ),
-//    ),
+    'forms' => array(
+      'move' => array(
+        'form id' => 'ctools_export_ui_edit_item_wizard_form',
+      ),
+    ),
   ),
 
   'handler' => array(
