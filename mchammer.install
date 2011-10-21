@@ -20,6 +20,7 @@ function mchammer_schema() {
       'default hook' => 'mchammer_mail_template_info',
       'list callback' => 'mchammer_mail_template_names',
       'save callback' => 'mchammer_mail_template_save',
+      'load callback' => 'mchammer_mail_template_load',
       //'delete callback' => 'mchammer_mail_template_delete',
       //'export callback' => 'heartbeat_message_template_export',
       'can disable' => TRUE,
