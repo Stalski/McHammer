@@ -8,17 +8,19 @@ class mchammer_mail_template_ui extends ctools_export_ui {
 
   function edit_form(&$form, &$form_state) {
 
-    // Get the basic edit form.
+    // Get the basic edit form
     parent::edit_form($form, $form_state);
 
-    $form['title'] = array(
+    $form['category'] = array(
       '#type' => 'textfield',
       '#size' => 24,
-      '#default_value' => $form_state['item']->title,
-      '#title' => t('Title'),
-      '#description' => t('The title for this mail template.'),
-      '#required' => TRUE,
+      '#default_value' => $form_state['item']->category,
+      '#title' => t('Category'),
+      '#description' => t("The category that this newsletter template will be grouped into on the Add Content form. Only upper and lower-case alphanumeric characters are allowed."),
     );
+
+    $form['title']['#title'] = t('Title');
+    $form['title']['#description'] = t('The title for this newsletter template.');
 
   }
 
