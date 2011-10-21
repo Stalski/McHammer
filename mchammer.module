@@ -69,7 +69,7 @@ function mchammer_ctools_plugin_directory($module, $plugin) {
 /**
  * List callback to show templates through CTools.
  */
-function mchammer_mail_template_names() {
+function mchammer_mail_templates_list() {
 
   $names = array();
   ctools_include('export');

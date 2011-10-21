@@ -12,13 +12,9 @@ function mchammer_schema() {
   $schema['mchammer_mail_templates'] = array(
     // CTools export definitions.
     'export' => array(
-      'key' => 'machine_name',
-      'key name' => 'Mail Template machine name',
-      'primary key' => 'mtid',
-      'bulk export' => TRUE,
       'identifier' => 'mail_template',
       'default hook' => 'mchammer_mail_template_info',
-      'list callback' => 'mchammer_mail_template_names',
+      'list callback' => 'mchammer_mail_templates_list',
       'save callback' => 'mchammer_mail_template_save',
       'load callback' => 'mchammer_mail_template_load',
       //'delete callback' => 'mchammer_mail_template_delete',
@@ -37,7 +33,7 @@ function mchammer_schema() {
         'not null' => TRUE,
         'description' => 'The internal identifier for a mail template.',
       ),
-      'machine_name' => array(
+      'name' => array(
         'type' => 'varchar',
         'length' => '255',
         'description' => 'The unique name of the newsletter template.',
@@ -72,7 +68,7 @@ function mchammer_schema() {
     ),
     'primary key' => array('mtid'),
     'unique keys' => array(
-      'machine_name' => array('machine_name'),
+      'machine_name' => array('name'),
     ),
   );
 
