@@ -178,11 +178,38 @@ function mail_template_access() {
 }
 
 /**
- * Loads a mail template.
- *
- * @return The mail_template entity or FALSE.
+ * Load a mchammer mail template..
  */
-function mail_template_load($machine_name) {
+function mchammer_mail_template_load($name) {
+
+  $cache = &drupal_static('mchammer_mail_templates', array());
+
+  // We use array_key_exists because failed loads will be NULL and
+  // isset() will try to load it again.
+  if (!array_key_exists($name, $cache)) {
+    ctools_include('export');
+    $result = ctools_export_load_object('mchammer_mail_templates', 'names', array($name));
+    if (isset($result[$name])) {
+      if (!empty($result[$name]->did)) {
+        $result[$name]->display = panels_load_display($result[$name]->did);
+        if (!empty($result[$name]->title) && empty($result[$name]->display->title)) {
+          $result[$name]->display->title = $result[$name]->title;
+        }
+      }
+      $cache[$name] = $result[$name];
+      if (!empty($result[$name]->title)) {
+        $cache[$name]->title = $result[$name]->title;
+      }
+    }
+    else {
+      $cache[$name] = NULL;
+    }
+  }
+
+  if (isset($cache[$name])) {
+    return $cache[$name];
+  }
+
 }
 
 /**
