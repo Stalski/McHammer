@@ -32,8 +32,10 @@ $plugin = array(
   ),
 
   'handler' => array(
+//    'class' => 'mchammer_newsletter_ui',
+//    'parent' => 'mchammer_mail_template_ui',
     'class' => 'mchammer_newsletter_ui',
-    'parent' => 'mchammer_mail_template_ui',
+    'parent' => 'ctools_export_ui',
   ),
 
 );

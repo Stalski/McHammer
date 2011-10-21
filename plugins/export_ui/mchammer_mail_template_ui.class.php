@@ -6,6 +6,15 @@
  */
 class mchammer_mail_template_ui extends ctools_export_ui {
 
+  /**
+   * Figure out what the cache key is for this object.
+   * We prefix with namespace: to filter the export key later.
+   */
+  function edit_cache_get_key($item, $op) {
+    $export_key = $this->plugin['export']['key'];
+    return $op == 'edit' ? 'template:' . $item->{$this->plugin['export']['key']} : "template:::$op";
+  }
+
   function list_build_row($item, &$form_state, $operations) {
     $operations['preview'] = array(
       'href' => 'mchammer/' . $item->name,
@@ -121,7 +130,8 @@ class mchammer_mail_template_ui extends ctools_export_ui {
       $this->edit_cache_set($form_state['item'], 'clone');
     }
 
-    $cache = panels_edit_cache_get('mchammer:' . $this->edit_cache_get_key($form_state['item'], $form_state['form type']));
+    $cache_key = $this->edit_cache_get_key($form_state['item'], $form_state['form type']);
+    $cache = panels_edit_cache_get('mchammer:' . $cache_key);
 
     $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
     $form_state['renderer']->cache = &$cache;

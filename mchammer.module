@@ -75,18 +75,28 @@ function mchammer_mail_templates_list() {
  */
 function _mchammer_panels_cache_get($key) {
   ctools_include('export-ui');
-  $plugin = ctools_get_export_ui('mail_templates.export_ui');
+
+  if (preg_match("|template:|", $key)) {
+    $plugin_name = 'mail_templates.export_ui';
+    $machine_name = preg_replace("|template:|", "", $key);
+  }
+  else {
+    $plugin_name = 'newsletter.export_ui';
+    $machine_name = preg_replace("|newsletter:|", "", $key);
+  }
+  $plugin = ctools_get_export_ui($plugin_name);
   $handler = ctools_export_ui_get_handler($plugin);
+
   if (!$handler) {
     return;
   }
 
-  $item = $handler->edit_cache_get($key);
+  $item = $handler->edit_cache_get($machine_name);
   if (!$item) {
-    $item = ctools_export_crud_load($handler->plugin['schema'], $key);
+    $item = ctools_export_crud_load($handler->plugin['schema'], $machine_name);
   }
 
-  return array($handler, $item);
+  return array($handler, $item, $machine_name);
 }
 
 /**
@@ -97,7 +107,7 @@ function _mchammer_panels_cache_get($key) {
  */
 function mchammer_panels_cache_get($key) {
   ctools_include('common', 'panels');
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   if (isset($item->mchammer_display_cache)) {
     return $item->mchammer_display_cache;
   }
@@ -118,7 +128,7 @@ function mchammer_panels_cache_get($key) {
  * Store a display edit in progress in the page cache.
  */
 function mchammer_panels_cache_set($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $item->mchammer_display_cache = $cache;
   $handler->edit_cache_set_key($item, $key);
 }
@@ -127,7 +137,7 @@ function mchammer_panels_cache_set($key, $cache) {
  * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_clear($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $handler->edit_cache_clear($item);
 }
 
@@ -135,7 +145,7 @@ function mchammer_panels_cache_clear($key, $cache) {
  * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_save($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $item->display = $cache->display;
   dsm($item);
   mchammer_mail_template_save($item);
