@@ -32,11 +32,15 @@ function mchammer_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  $items['mchammer/%mchammer_newsletter'] = array(
+  // Avoiding the possibility to have the same machine name.
+  // @TODO check if this is the best way. Maybe it's better to
+  // check on edit_form_validation in newsletter plugin to make sure
+  // it does not exist in mail templates AND newsletters.
+  $items['mchammer/newsletter/%mchammer_newsletter'] = array(
     'title' => 'Newsletter',
     'access arguments' => array('view all newsletters'),
     'page callback' => 'mchammer_newsletter_page',
-    'page arguments' => array(1),
+    'page arguments' => array(2),
     'file' => 'mchammer.pages.inc',
     'type' => MENU_CALLBACK,
   );

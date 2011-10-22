@@ -102,6 +102,21 @@ function mchammer_schema() {
         'current_version' => 1,
       ),
     ),
+
+// @TODO check if this would open possibilities. Like really inherit the export plugin objects
+// and delegating the properties from the template to the newsletter (making newsletter dumber).
+//    'join' => array(
+//      'exportables' => array(
+//        'table' => 'mchammer_mail_templates',
+//        'left_key' => 'mail_template_name',
+//        'right_key' => 'name',
+//        'callback' => 'mchammer_mail_template_join_newsletter',
+//        'load' => array(
+//          'machine',
+//        ),
+//      ),
+//    ),
+
     'fields' => array(
       'mnid' => array(
         'type' => 'serial',
@@ -112,6 +127,11 @@ function mchammer_schema() {
         'type' => 'varchar',
         'length' => '255',
         'description' => 'The unique name of the newsletter.',
+      ),
+      'mail_template_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'description' => 'The reference to the mail template this newsletter is derived from.',
       ),
       'category' => array(
         'type' => 'varchar',

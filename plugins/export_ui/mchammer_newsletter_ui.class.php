@@ -15,14 +15,24 @@ class mchammer_newsletter_ui extends ctools_export_ui {
   }
 
   function list_build_row($item, &$form_state, $operations) {
-    $operations['preview'] = array(
-      'href' => 'mchammer/' . $item->name,
-      'title' => t('Preview'),
+    $operations['view'] = array(
+      'href' => 'mchammer/newsletter/' . $item->name,
+      'title' => t('View'),
     );
     parent::list_build_row($item, $form_state, $operations);
   }
 
   function edit_form(&$form, &$form_state) {
+
+    ctools_include('export');
+    $options = array(0 => t('None'));
+    foreach (ctools_export_load_object('mchammer_mail_templates', 'all') as $name => $option) {
+      $options[$name] = $option->admin_title;
+    }
+
+    if (empty($options)) {
+      return;
+    }
 
     // Get the basic edit form
     parent::edit_form($form, $form_state);
@@ -35,16 +45,27 @@ class mchammer_newsletter_ui extends ctools_export_ui {
       '#description' => t("The category that this newsletter template will be grouped into on the Add Content form. Only upper and lower-case alphanumeric characters are allowed."),
     );
 
+    $form['mail_template_name'] = array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => $form_state['item']->mail_template_name,
+      '#title' => t('Mail template'),
+      '#description' => t('Mail template this newsletter should be derived from'),
+    );
+
     $form['title']['#title'] = t('Title');
     $form['title']['#description'] = t('The title for this newsletter template.');
 
   }
 
   /**
-   * Validate submission of the mini panel edit form.
+   * Validate submission of the newsletter edit form.
    */
   function edit_form_basic_validate($form, &$form_state) {
     parent::edit_form_validate($form, $form_state);
+    if (empty($form_state['values']['mail_template_name'])) {
+      form_error($form['mail_template_name'], t('A newsletter must be derived from a dynamic mail template.'));
+    }
     if (preg_match("/[^A-Za-z0-9 ]/", $form_state['values']['category'])) {
       form_error($form['category'], t('Categories may contain only alphanumerics or spaces.'));
     }
@@ -62,8 +83,10 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     // Trigger the module restriction for the allowed layouts.
     $form_state['allowed_layouts'] = 'mchammer';
 
-    if ($form_state['op'] == 'add' && empty($form_state['item']->display)) {
-      $form_state['item']->display = panels_new_display();
+    // Inherit the display when creating the newsletter.
+    // @TODO Integrate this with zuuperman pull-everything-apart generate/derive method.
+    if ($form_state['op'] == 'add') {
+      $form_state['item'] = mchammer_mail_template_load($form_state['item']->mail_template_name);
     }
 
     $form_state['display'] = &$form_state['item']->display;
