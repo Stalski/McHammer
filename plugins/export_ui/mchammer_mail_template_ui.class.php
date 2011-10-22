@@ -60,8 +60,8 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     ctools_include('display-layout', 'panels');
     ctools_include('plugins', 'panels');
 
-    // @todo -- figure out where/how to deal with this.
-    $form_state['allowed_layouts'] = 'mchammer_mail_template';
+    // Trigger the module restriction for the allowed layouts.
+    $form_state['allowed_layouts'] = 'mchammer';
 
     if ($form_state['op'] == 'add' && empty($form_state['item']->display)) {
       $form_state['item']->display = panels_new_display();

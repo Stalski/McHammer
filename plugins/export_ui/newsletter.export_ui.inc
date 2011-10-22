@@ -7,8 +7,8 @@ $plugin = array(
   'menu' => array(
     'menu prefix' => 'admin/structure/mchammer', // default
     'menu item' => 'newsletter', // default
-    'menu title' => 'McHammer newsletters',
-    'menu description' => 'Administer newsletters.',
+    'menu title' => 'Administer newsletters',
+    'menu description' => 'A MCHammer Newsletter is the mail content that will be used to schedule and send.',
   ),
 
   'title singular' => t('Newsletter'),

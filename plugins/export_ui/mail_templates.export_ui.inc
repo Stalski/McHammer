@@ -7,8 +7,8 @@ $plugin = array(
   'menu' => array(
     'menu prefix' => 'admin/structure/mchammer', // default
     'menu item' => 'mail-template', // default
-    'menu title' => 'McHammer mail templates',
-    'menu description' => 'Administer mail templates.',
+    'menu title' => 'Administer mail templates',
+    'menu description' => 'The MCHammer templates define how mail content will be built, meaning the content can be dynamic and custom.',
   ),
 
   'title singular' => t('Mail template'),

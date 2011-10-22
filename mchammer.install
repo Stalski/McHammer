@@ -5,6 +5,24 @@
  */
 
 /**
+ * Implements hook_install().
+ */
+function mchammer_install() {
+
+  // Add a panels allowed layout for this module which cannot be changed!
+  // @TODO Refactor this so the allowed_layout_settings is dynamic.
+  $settings = new panels_allowed_layouts();
+  $settings->module_name = 'mchammer';
+  $settings->allow_new = TRUE;
+  $settings->allowed_layout_settings = array(
+    'onecol_mailtemplate' => TRUE,
+  );
+  $settings->form_state = NULL;
+  variable_set("mchammer_allowed_layouts", serialize($settings));
+
+}
+
+/**
  * Implements hook_schema().
  */
 function mchammer_schema() {
