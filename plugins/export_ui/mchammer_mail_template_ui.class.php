@@ -42,7 +42,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
   }
 
   /**
-   * Validate submission of the mini panel edit form.
+   * Validate submission of the mail template edit form.
    */
   function edit_form_basic_validate($form, &$form_state) {
     parent::edit_form_validate($form, $form_state);

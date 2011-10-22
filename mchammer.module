@@ -71,7 +71,7 @@ function mchammer_mail_templates_list() {
 
 }
 /**
- * Get the display cache for the panels_mini plugin.
+ * Get the display cache for the mail_template or newsletter plugin.
  */
 function _mchammer_panels_cache_get($key) {
   ctools_include('export-ui');
@@ -91,7 +91,7 @@ function _mchammer_panels_cache_get($key) {
     return;
   }
 
-  $item = $handler->edit_cache_get($machine_name);
+  $item = $handler->edit_cache_get($key);
   if (!$item) {
     $item = ctools_export_crud_load($handler->plugin['schema'], $machine_name);
   }
@@ -147,7 +147,6 @@ function mchammer_panels_cache_clear($key, $cache) {
 function mchammer_panels_cache_save($key, $cache) {
   list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $item->display = $cache->display;
-  dsm($item);
   mchammer_mail_template_save($item);
   $handler->edit_cache_clear($item);
 }
