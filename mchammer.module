@@ -1,7 +1,17 @@
 <?php
 /*
  * @file
+ * McHammer Mail composing tool.
  *
+ * Mail content can be scheduled:
+ * 1) Scheduling is done within McHammer:
+ *    - McHammer needs at least date and a group of recipients (often "list").
+ *    - invoke a method on cron when scheduled date occurs.
+ *    - call a remote method to an integrated tool (like EMF, MailChimp) to send
+ *      the mail at that time to a list of users.
+ * 2) Scheduling is done from within a remote UI like a MailChimp account:
+ *    - pull in the mail content by selecting content from a list (service).
+ * -
  */
 
 
@@ -47,6 +57,23 @@ function mchammer_menu() {
 
   return $items;
 
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mchammer_theme() {
+  return array(
+    'page-mchammer' => array(
+      'variables' => array(),
+      'file' => 'includes/theme.inc',
+      'function' => 'mchammer_page',
+    ),
+    'html-mchammer' => array(
+      'variables' => array(),
+      'template' => 'templates/mchammer-newsletter',
+    ),
+  );
 }
 
 /**
@@ -180,6 +207,35 @@ function mchammer_permission() {
       'description' => t('View all newsletters')
     ),
   );
+}
+
+/**
+ * Implements hook_preprocess_page().
+ * Preprocess the pages.
+ */
+function mchammer_preprocess_page(&$vars) {
+  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+    $variables['theme_hook_suggestion'] = 'page-mchammer';
+    include_once(dirname(__FILE__) . '/includes/theme.inc');
+  }
+}
+
+/**
+ * Implements hook_process_html().
+ * Set the theme hook suggestion to html-mchammer for newsletter pages.
+ */
+function mchammer_process_html(&$variables) {
+  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+    $js = drupal_add_js();
+    if (module_exists('admin_menu')) {
+      $path = drupal_get_path('module', 'admin_menu');
+      if (isset($js[$path . '/admin_menu.js'])) {
+        unset($js[$path . '/admin_menu.js']);
+        $variables['scripts'] = drupal_get_js('header', $js);
+      }
+    }
+    $variables['theme_hook_suggestion'] = 'html-mchammer';
+  }
 }
 
 /**
