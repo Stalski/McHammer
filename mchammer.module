@@ -1,8 +1,19 @@
 <?php
 /*
  * @file
+ * McHammer Mail composing tool.
  *
+ * Mail content can be scheduled:
+ * 1) Scheduling is done within McHammer:
+ *    - McHammer needs at least date and a group of recipients (often "list").
+ *    - invoke a method on cron when scheduled date occurs.
+ *    - call a remote method to an integrated tool (like EMF, MailChimp) to send
+ *      the mail at that time to a list of users.
+ * 2) Scheduling is done from within a remote UI like a MailChimp account:
+ *    - pull in the mail content by selecting content from a list (service).
+ * -
  */
+
 
 /**
  * Implements hook_menu().
@@ -22,39 +33,47 @@ function mchammer_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  // List is taken over by CTools.
-//
-//  $items['admin/structure/mchammer/mail-template/add'] = array(
-//    'title' => 'Add template',
-//    'access arguments' => array('administer mail templates'),
-//    'page callback' => 'mchammer_add_template',
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//  );
-//
-//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_layout'] = array(
-//    'title' => 'Panel layout',
-//    'page callback' => 'mchammer_edit_layout',
-//    'page arguments' => array(3),
-//    'access arguments' => array('administer mail templates'),
-//    'page callback' => 'mchammer_edit_layout',
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//    'weight' => 2,
-//  );
-//
-//  $items['admin/structure/mchammer/mail-template/%mail_template/panel_content'] = array(
-//    'title' => 'Panel content',
-//    'page callback' => 'mchammer_edit_content',
-//    'page arguments' => array(3),
-//    'access arguments' => array('administer mail templates'),
-//    'file' => 'includes/admin.inc',
-//    'type' => MENU_LOCAL_TASK,
-//    'weight' => 3,
-//  );
+  $items['mchammer/%mchammer_mail_template'] = array(
+    'title' => 'Mail template',
+    'access arguments' => array('preview mail templates'),
+    'page callback' => 'mchammer_mail_template_page',
+    'page arguments' => array(1),
+    'file' => 'mchammer.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  // Avoiding the possibility to have the same machine name.
+  // @TODO check if this is the best way. Maybe it's better to
+  // check on edit_form_validation in newsletter plugin to make sure
+  // it does not exist in mail templates AND newsletters.
+  $items['mchammer/newsletter/%mchammer_newsletter'] = array(
+    'title' => 'Newsletter',
+    'access arguments' => array('view all newsletters'),
+    'page callback' => 'mchammer_newsletter_page',
+    'page arguments' => array(2),
+    'file' => 'mchammer.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
 
   return $items;
 
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mchammer_theme() {
+  return array(
+    'page-mchammer' => array(
+      'variables' => array(),
+      'file' => 'includes/theme.inc',
+      'function' => 'mchammer_page',
+    ),
+    'html-mchammer' => array(
+      'variables' => array(),
+      'template' => 'templates/mchammer-newsletter',
+    ),
+  );
 }
 
 /**
@@ -84,22 +103,32 @@ function mchammer_mail_templates_list() {
 
 }
 /**
- * Get the display cache for the panels_mini plugin.
+ * Get the display cache for the mail_template or newsletter plugin.
  */
 function _mchammer_panels_cache_get($key) {
   ctools_include('export-ui');
-  $plugin = ctools_get_export_ui('mail_templates.export_ui');
+
+  if (preg_match("|template:|", $key)) {
+    $plugin_name = 'mail_templates.export_ui';
+    $machine_name = preg_replace("|template:|", "", $key);
+  }
+  else {
+    $plugin_name = 'newsletter.export_ui';
+    $machine_name = preg_replace("|newsletter:|", "", $key);
+  }
+  $plugin = ctools_get_export_ui($plugin_name);
   $handler = ctools_export_ui_get_handler($plugin);
+
   if (!$handler) {
     return;
   }
 
   $item = $handler->edit_cache_get($key);
   if (!$item) {
-    $item = ctools_export_crud_load($handler->plugin['schema'], $key);
+    $item = ctools_export_crud_load($handler->plugin['schema'], $machine_name);
   }
 
-  return array($handler, $item);
+  return array($handler, $item, $machine_name);
 }
 
 /**
@@ -110,7 +139,7 @@ function _mchammer_panels_cache_get($key) {
  */
 function mchammer_panels_cache_get($key) {
   ctools_include('common', 'panels');
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   if (isset($item->mchammer_display_cache)) {
     return $item->mchammer_display_cache;
   }
@@ -131,7 +160,7 @@ function mchammer_panels_cache_get($key) {
  * Store a display edit in progress in the page cache.
  */
 function mchammer_panels_cache_set($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $item->mchammer_display_cache = $cache;
   $handler->edit_cache_set_key($item, $key);
 }
@@ -140,7 +169,7 @@ function mchammer_panels_cache_set($key, $cache) {
  * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_clear($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $handler->edit_cache_clear($item);
 }
 
@@ -148,9 +177,9 @@ function mchammer_panels_cache_clear($key, $cache) {
  * Save all changes made to a display using the MCHammer mail templates UI cache.
  */
 function mchammer_panels_cache_save($key, $cache) {
-  list($handler, $item) = _mchammer_panels_cache_get($key);
+  list($handler, $item, $machine_name) = _mchammer_panels_cache_get($key);
   $item->display = $cache->display;
-  panels_mini_save($item);
+  mchammer_mail_template_save($item);
   $handler->edit_cache_clear($item);
 }
 
@@ -169,7 +198,44 @@ function mchammer_permission() {
       'title' => t('Administer mail templates'),
       'description' => t('Add and edit mail templates.'),
     ),
+    'preview mail templates' => array(
+      'title' => t('Preview mail templates'),
+      'description' => t('Preview mail templates')
+    ),
+    'view all newsletters' => array(
+      'title' => t('View all newsletters'),
+      'description' => t('View all newsletters')
+    ),
   );
+}
+
+/**
+ * Implements hook_preprocess_page().
+ * Preprocess the pages.
+ */
+function mchammer_preprocess_page(&$vars) {
+  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+    $variables['theme_hook_suggestion'] = 'page-mchammer';
+    include_once(dirname(__FILE__) . '/includes/theme.inc');
+  }
+}
+
+/**
+ * Implements hook_process_html().
+ * Set the theme hook suggestion to html-mchammer for newsletter pages.
+ */
+function mchammer_process_html(&$variables) {
+  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+    $js = drupal_add_js();
+    if (module_exists('admin_menu')) {
+      $path = drupal_get_path('module', 'admin_menu');
+      if (isset($js[$path . '/admin_menu.js'])) {
+        unset($js[$path . '/admin_menu.js']);
+        $variables['scripts'] = drupal_get_js('header', $js);
+      }
+    }
+    $variables['theme_hook_suggestion'] = 'html-mchammer';
+  }
 }
 
 /**
@@ -180,17 +246,46 @@ function mail_template_access() {
 }
 
 /**
- * Load a mchammer mail template..
+ * Load a mchammer mail template.
  */
 function mchammer_mail_template_load($name) {
+  return mchammer_ctools_crud_load($name, 'mchammer_mail_templates');
+}
 
-  $cache = &drupal_static('mchammer_mail_templates', array());
+/**
+ * Write a McHammer mail template to the database.
+ */
+function mchammer_mail_template_save(&$mail_template) {
+  return mchammer_ctools_crud_save($mail_template, 'mchammer_mail_templates', 'mtid');
+}
+
+/**
+ * Load a mchammer newsletter.
+ */
+function mchammer_newsletter_load($name) {
+  return mchammer_ctools_crud_load($name, 'mchammer_newsletters');
+}
+
+/**
+ * Write a McHammer newsletter to the database.
+ */
+function mchammer_newsletter_save(&$mail_template) {
+  return mchammer_ctools_crud_save($mail_template, 'mchammer_newsletters', 'mnid');
+}
+
+/**
+ * Helper function to load a cached display of CTools export objects
+ * inside McHammer.
+ */
+function mchammer_ctools_crud_load($name, $table) {
+
+  $cache = &drupal_static($table, array());
 
   // We use array_key_exists because failed loads will be NULL and
   // isset() will try to load it again.
   if (!array_key_exists($name, $cache)) {
     ctools_include('export');
-    $result = ctools_export_load_object('mchammer_mail_templates', 'names', array($name));
+    $result = ctools_export_load_object($table, 'names', array($name));
     if (isset($result[$name])) {
       if (!empty($result[$name]->did)) {
         $result[$name]->display = panels_load_display($result[$name]->did);
@@ -215,6 +310,7 @@ function mchammer_mail_template_load($name) {
 }
 
 /**
+<<<<<<< HEAD
  * Load all mini panels.
  */
 function mchammer_mail_template_load_all($reset = FALSE) {
@@ -265,17 +361,21 @@ function mchammer_mail_template_load_all($reset = FALSE) {
 
 /**
  * Write a mini panel to the database.
+=======
+ * Helper function to save a cached display of CTools export objects
+ * inside McHammer.
+>>>>>>> 5d04f939d61d741155e4464f01cbe7e84596426b
  */
-function mchammer_mail_template_save(&$mail_template) {
+function mchammer_ctools_crud_save(&$object, $table, $id) {
 
-  if (!empty($mail_template->display)) {
-    $display = panels_save_display($mail_template->display);
-    $mail_template->did = $display->did;
+  if (!empty($object->display)) {
+    $display = panels_save_display($object->display);
+    $object->did = $display->did;
   }
 
-  $update = (isset($mail_template->mtid) && $mail_template->mtid != 'new') ? array('mtid') : array();
-  drupal_write_record('mchammer_mail_templates', $mail_template, $update);
+  $update = (isset($object->$id) && $object->$id != 'new') ? array($id) : array();
+  drupal_write_record($table, $object, $update);
 
-  return $mail_template;
+  return $object;
 
 }

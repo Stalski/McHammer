@@ -5,6 +5,24 @@
  */
 
 /**
+ * Implements hook_install().
+ */
+function mchammer_install() {
+
+  // Add a panels allowed layout for this module which cannot be changed!
+  // @TODO Refactor this so the allowed_layout_settings is dynamic.
+  $settings = new panels_allowed_layouts();
+  $settings->module_name = 'mchammer';
+  $settings->allow_new = TRUE;
+  $settings->allowed_layout_settings = array(
+    'onecol_mailtemplate' => TRUE,
+  );
+  $settings->form_state = NULL;
+  variable_set("mchammer_allowed_layouts", serialize($settings));
+
+}
+
+/**
  * Implements hook_schema().
  */
 function mchammer_schema() {
@@ -65,6 +83,86 @@ function mchammer_schema() {
       ),
     ),
     'primary key' => array('mtid'),
+    'unique keys' => array(
+      'machine_name' => array('name'),
+    ),
+  );
+
+  $schema['mchammer_newsletters'] = array(
+    // CTools export definitions.
+    'export' => array(
+      'identifier' => 'newsletter',
+      'default hook' => 'mchammer_newsletter_info',
+      'list callback' => 'mchammer_newsletters_list',
+      'save callback' => 'mchammer_newsletter_save',
+      'load callback' => 'mchammer_newsletter_load',
+      'api' => array(
+        'owner' => 'mchammer',
+        'api' => 'panels_default',
+        'minimum_version' => 1,
+        'current_version' => 1,
+      ),
+    ),
+
+// @TODO check if this would open possibilities. Like really inherit the export plugin objects
+// and delegating the properties from the template to the newsletter (making newsletter dumber).
+//    'join' => array(
+//      'exportables' => array(
+//        'table' => 'mchammer_mail_templates',
+//        'left_key' => 'mail_template_name',
+//        'right_key' => 'name',
+//        'callback' => 'mchammer_mail_template_join_newsletter',
+//        'load' => array(
+//          'machine',
+//        ),
+//      ),
+//    ),
+
+    'fields' => array(
+      'mnid' => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+        'description' => 'The internal identifier for a newsletter.',
+      ),
+      'name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'description' => 'The unique name of the newsletter.',
+      ),
+      'mail_template_name' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'description' => 'The reference to the mail template this newsletter is derived from.',
+      ),
+      'category' => array(
+        'type' => 'varchar',
+        'length' => '64',
+        'description' => 'The category this newsletter appears in on the add content pane.',
+      ),
+      'did' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'description' => 'The panels display id from this newsletter',
+      ),
+      'admin_title' => array(
+        'type' => 'varchar',
+        'length' => '128',
+        'description' => 'The administrative title of the newsletter.',
+      ),
+      'admin_description' => array(
+        'type' => 'text',
+        'size' => 'big',
+        'description' => 'Administrative title of this newsletter.',
+        'object default' => '',
+      ),
+      'subject' => array(
+        'type' => 'varchar',
+        'length' => '255',
+        'not null' => TRUE,
+        'description' => 'The subject of the newsletter.',
+      ),
+    ),
+    'primary key' => array('mnid'),
     'unique keys' => array(
       'machine_name' => array('name'),
     ),
