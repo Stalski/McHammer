@@ -55,7 +55,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
    * Step 2 of wizard: Choose a layout.
    */
   function edit_form_layout(&$form, &$form_state) {
-dsm($form_state);
+
     ctools_include('common', 'panels');
     ctools_include('display-layout', 'panels');
     ctools_include('plugins', 'panels');
@@ -156,6 +156,51 @@ dsm($form_state);
   function edit_form_content_submit(&$form, &$form_state) {
     panels_edit_display_form_submit($form, $form_state);
     $form_state['item']->display = $form_state['display'];
+  }
+
+  function create_newsletter($mailtemplate_name) {
+
+    ctools_include('content');
+
+    // Load the original mail template
+    $template = mchammer_mail_template_load($mailtemplate_name);
+
+    $display = panels_new_display();
+    $display->layout = $template->display->layout;
+
+    // Construct the panes for the new display
+    foreach ($template->display->panels as $region) {
+
+      foreach ($region as $pid) {
+
+        $pane = $template->display->content[$pid];
+        // Generate a pane for every view result.
+        if ($pane->type == 'views') {
+          if ($view = views_get_view($pane->subtype)) {
+            $view->execute();
+            foreach ($view->result as $result) {
+
+              $new_pane = panels_new_pane('node', 'node', TRUE);
+              $new_pane->configuration['nid'] = $result->nid;
+              $display->add_pane($new_pane, $pane->panel);
+              unset($new_pane);
+
+            }
+          }
+        }
+        // Copy pane to the display.
+        else {
+          $new_pane = $template->display->clone_pane($pane->pid);
+          $display->add_pane($new_pane, $pane->panel);
+          unset($new_pane);
+        }
+
+      }
+
+    }
+
+    return $display;
+
   }
 
 }

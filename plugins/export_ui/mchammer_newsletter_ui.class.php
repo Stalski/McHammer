@@ -78,44 +78,10 @@ class mchammer_newsletter_ui extends ctools_export_ui {
    */
   function edit_form_basic_submit($form, &$form_state) {
 
-    ctools_include('content');
+    parent::edit_form_submit($form, $form_state);
 
-    // Load the original mail template
-    $template = mchammer_mail_template_load($form_state['values']['mail_template_name']);
-
-    $display = panels_new_display();
-    $display->layout = $template->display->layout;
-
-    // Construct the panes for the new display
-    foreach ($template->display->panels as $region) {
-
-      foreach ($region as $pid) {
-
-        $pane = $template->display->content[$pid];
-        // Generate a pane for every view result.
-        if ($pane->type == 'views') {
-          if ($view = views_get_view($pane->subtype)) {
-            $view->execute();
-            foreach ($view->result as $result) {
-
-              $new_pane = panels_new_pane('node', 'node', TRUE);
-              $new_pane->configuration['nid'] = $result->nid;
-              $display->add_pane($new_pane, $pane->panel);
-              unset($new_pane);
-
-            }
-          }
-        }
-        // Copy pane to the display.
-        else {
-          $new_pane = $template->display->clone_pane($pane->pid);
-          $display->add_pane($new_pane, $pane->panel);
-          unset($new_pane);
-        }
-
-      }
-
-    }
+    $mailtemplate_ui = new mchammer_mail_template_ui();
+    $display = $mailtemplate_ui->create_newsletter($form_state['values']['mail_template_name']);
 
     $form_state['item']->display = $display;
     $form_state['display'] = &$form_state['item']->display;
@@ -123,10 +89,10 @@ class mchammer_newsletter_ui extends ctools_export_ui {
   }
 
   /**
-   * Step 3 of wizard: Choose the content.
+   * Step 2 of wizard: Choose the content.
    */
   function edit_form_content(&$form, &$form_state) {
-dsm($form_state);
+
     ctools_include('ajax');
     ctools_include('plugins', 'panels');
     ctools_include('display-edit', 'panels');
@@ -160,7 +126,6 @@ dsm($form_state);
    * Save the display.
    */
   function edit_form_content_submit(&$form, &$form_state) {
-    dsm($form_state);
     panels_edit_display_form_submit($form, $form_state);
     $form_state['item']->display = $form_state['display'];
   }
