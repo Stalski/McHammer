@@ -5,6 +5,8 @@ core = 7.x
 files[] = includes/mail_template.entitycontroller.inc
 files[] = includes/mail_template.entity.inc
 files[] = includes/mail_template.info.inc
+files[] = includes/mchammerextractor.class.inc
+files[] = includes/mchammerviewsextractor.class.inc
 files[] = plugins/export_ui/mchammer_mail_template_ui.class.php
 
 dependencies[] = ctools
