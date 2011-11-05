@@ -5,7 +5,6 @@
  *
  * Extractor class that handles views extraction to panes.
  */
-
 class McHammerViewsExtractor extends McHammerExtractor implements McHammerExtractorInterface {
 
   /**

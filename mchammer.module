@@ -3,19 +3,6 @@
  * @file
  * McHammer Mail composing tool.
  *
- * TODO's
- * 1) Zorg dat alle "extracted" elementen van een view iets in hun display settings krijgen zodat wij later weten welke items we mogen "wipen"
- * 2) Maak een locked state en button om een newsletter te kunnen "vastleggen". Zor wordt hij verstuurd en gebruikt dan.
- *
- * Mail content can be scheduled:
- * 1) Scheduling is done within McHammer:
- *    - McHammer needs at least date and a group of recipients (often "list").
- *    - invoke a method on cron when scheduled date occurs.
- *    - call a remote method to an integrated tool (like EMF, MailChimp) to send
- *      the mail at that time to a list of users.
- * 2) Scheduling is done from within a remote UI like a MailChimp account:
- *    - pull in the mail content by selecting content from a list (service).
- * -
  */
 
 /**
