@@ -26,12 +26,7 @@ function mchammer_page($variables) {
   global $theme;
 
   if (isset($variables['page'][$region])) {
-    $output .= drupal_render($variables['page'][$region]);
-  }
-  // Omega theme uses zones
-  elseif (isset($variables['page']['content_zone']['#regions']['content'])) {
-    $variables['page']['content_zone']['#regions']['content']['#omega']['page_data']['title'] = FALSE;
-    $output .= drupal_render($variables['page']['content_zone']['#regions']['content']);
+    $output = mchammer_render_page_content($variables['page'][$region]);
   }
 
   return $output;

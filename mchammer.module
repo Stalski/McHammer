@@ -14,7 +14,6 @@
  * -
  */
 
-
 /**
  * Implements hook_menu().
  */
@@ -72,6 +71,11 @@ function mchammer_theme() {
     'html-mchammer' => array(
       'variables' => array(),
       'template' => 'templates/mchammer-newsletter',
+    ),
+    'panels_pane_mchammer' => array(
+      'template' => 'panels-pane-mchammer',
+      'path' => drupal_get_path('module', 'mchammer') . '/templates',
+      'variables' => array('output' => array(), 'pane' => array(), 'display' => array()),
     ),
   );
 }
@@ -211,31 +215,38 @@ function mchammer_permission() {
 
 /**
  * Implements hook_preprocess_page().
- * Preprocess the pages.
+ * Set the theme hook to page-mchammer for newsletter pages.
  */
-function mchammer_preprocess_page(&$vars) {
+function mchammer_preprocess_page(&$variables) {
+
   if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
     $variables['theme_hook_suggestion'] = 'page-mchammer';
     include_once(dirname(__FILE__) . '/includes/theme.inc');
   }
+
 }
 
 /**
  * Implements hook_process_html().
  * Set the theme hook suggestion to html-mchammer for newsletter pages.
+ * Reset all css / js.
  */
 function mchammer_process_html(&$variables) {
+
   if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
-    $js = drupal_add_js();
-    if (module_exists('admin_menu')) {
-      $path = drupal_get_path('module', 'admin_menu');
-      if (isset($js[$path . '/admin_menu.js'])) {
-        unset($js[$path . '/admin_menu.js']);
-        $variables['scripts'] = drupal_get_js('header', $js);
-      }
-    }
+    $variables['scripts'] = '';
+    $variables['styles'] = '';
     $variables['theme_hook_suggestion'] = 'html-mchammer';
   }
+
+}
+
+/**
+ * Implements hook_preprocess_panels_pane().
+ * Use the mc hammer pane template.
+ */
+function mchammer_preprocess_panels_pane(&$vars) {
+  $vars['theme_hook_suggestions'] = array('panels_pane_mchammer');
 }
 
 /**
@@ -324,5 +335,31 @@ function mchammer_ctools_crud_save(&$object, $table, $id) {
   drupal_write_record($table, $object, $update);
 
   return $object;
+
+}
+
+/**
+ * Render the system main block only.
+ * @param $element Render array
+ */
+function mchammer_render_page_content($element) {
+
+  $output = '';
+  foreach (element_children($element) as $key) {
+
+    if ($key == 'system_main') {
+      return drupal_render($element[$key]);
+    }
+    else {
+      $output = imagecrop_render_main_content($element[$key]);
+    }
+
+    if (!empty($output)) {
+      return $output;
+    }
+
+  }
+
+  return $output;
 
 }

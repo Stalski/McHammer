@@ -11,4 +11,5 @@ $plugin = array(
   'theme' => 'panels_onecol_mailtemplate',
   'css' => 'onecol.css',
   'regions' => array('middle' => t('Middle column')),
+  'module' => 'mchammer',
 );

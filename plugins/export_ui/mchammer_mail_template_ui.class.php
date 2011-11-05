@@ -61,7 +61,14 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     ctools_include('plugins', 'panels');
 
     // Trigger the module restriction for the allowed layouts.
-    $form_state['allowed_layouts'] = 'mchammer';
+    $available_layouts = panels_get_layouts();
+    $allowed_layouts = new stdClass();
+    $allowed_layouts->allowed_layout_settings = array();
+    foreach ($available_layouts as $name => $layout) {
+      $allowed_layouts->allowed_layout_settings[$name] = $layout['module'] == 'mchammer';
+    }
+
+    $form_state['allowed_layouts'] = $allowed_layouts;
 
     // Make sure there is a display to work with.
     if ($form_state['op'] == 'add' && empty($form_state['item']->display)) {
@@ -144,6 +151,7 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $form_state['display_title'] = !empty($cache->display_title);
 
     $form = panels_edit_display_form($form, $form_state);
+dsm($form);
 
     // Make sure the theme will work since our form id is different.
     $form['#theme'] = 'panels_edit_display_form';
@@ -158,6 +166,11 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $form_state['item']->display = $form_state['display'];
   }
 
+  /**
+   * Create the newsletter display from a given display name.
+   * @param $mailtemplate_name Machine name from the panel display to use.
+   * @return A new generated panel display.
+   */
   function create_newsletter($mailtemplate_name) {
 
     ctools_include('content');
