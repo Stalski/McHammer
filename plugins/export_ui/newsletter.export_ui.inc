@@ -23,6 +23,12 @@ $plugin = array(
       'basic' => t('Settings'),
       'content' => t('Content'),
     ),
+    // We have to add this form specially because it's invisible.
+    'forms' => array(
+      'lock' => array(
+        'form id' => 'ctools_export_ui_edit_item_wizard_form',
+      ),
+    ),
   ),
 
   'handler' => array(

@@ -3,6 +3,10 @@
  * @file
  * McHammer Mail composing tool.
  *
+ * TODO's
+ * 1) Zorg dat alle "extracted" elementen van een view iets in hun display settings krijgen zodat wij later weten welke items we mogen "wipen"
+ * 2) Maak een locked state en button om een newsletter te kunnen "vastleggen". Zor wordt hij verstuurd en gebruikt dan.
+ *
  * Mail content can be scheduled:
  * 1) Scheduling is done within McHammer:
  *    - McHammer needs at least date and a group of recipients (often "list").
@@ -231,7 +235,7 @@ function mchammer_process_html(&$variables) {
 /**
  * Determines whether the given user has access to a mail.
  */
-function mail_template_access() {
+function mchammer_mail_template_access() {
   return user_access('administer mail templates');
 }
 
