@@ -38,7 +38,7 @@ function mchammer_menu() {
     'access arguments' => array('preview mail templates'),
     'page callback' => 'mchammer_mail_template_page',
     'page arguments' => array(1),
-    'file' => 'mchammer.pages.inc',
+    'file' => 'includes/pages.inc',
     'type' => MENU_CALLBACK,
   );
 
@@ -51,7 +51,7 @@ function mchammer_menu() {
     'access arguments' => array('view all newsletters'),
     'page callback' => 'mchammer_newsletter_page',
     'page arguments' => array(2),
-    'file' => 'mchammer.pages.inc',
+    'file' => 'includes/pages.inc',
     'type' => MENU_CALLBACK,
   );
 
@@ -77,6 +77,30 @@ function mchammer_theme() {
 }
 
 /**
+ * Implements hook_permission().
+ */
+function mchammer_permission() {
+  return array(
+    'administer mail templates' =>  array(
+      'title' => t('Administer mail templates'),
+      'description' => t('Add and edit mail templates.'),
+    ),
+    'preview mail templates' => array(
+      'title' => t('Preview mail templates'),
+      'description' => t('Preview mail templates')
+    ),
+    'view all newsletters' => array(
+      'title' => t('View all newsletters'),
+      'description' => t('View all newsletters')
+    ),
+    'create newsletters' => array(
+      'title' => t('Create newsletters'),
+      'description' => t('Create and derive newsletters')
+    ),
+  );
+}
+
+/**
  * Implements hook_ctools_plugin_directory().
  */
 function mchammer_ctools_plugin_directory($module, $plugin) {
@@ -88,20 +112,6 @@ function mchammer_ctools_plugin_directory($module, $plugin) {
   }
 }
 
-/**
- * List callback to show templates through CTools.
- */
-function mchammer_mail_templates_list() {
-
-  $names = array();
-  ctools_include('export');
-  foreach(ctools_export_crud_load_all('mchammer_mail_templates') as $template) {
-    $names[$template->mtid] = $template->title;
-  }
-
-  return $names;
-
-}
 /**
  * Get the display cache for the mail_template or newsletter plugin.
  */
@@ -190,26 +200,6 @@ function mchammer_panels_cache_break_lock($key, $cache) {
 }
 
 /**
- * Implements hook_permission().
- */
-function mchammer_permission() {
-  return array(
-    'administer mail templates' =>  array(
-      'title' => t('Administer mail templates'),
-      'description' => t('Add and edit mail templates.'),
-    ),
-    'preview mail templates' => array(
-      'title' => t('Preview mail templates'),
-      'description' => t('Preview mail templates')
-    ),
-    'view all newsletters' => array(
-      'title' => t('View all newsletters'),
-      'description' => t('View all newsletters')
-    ),
-  );
-}
-
-/**
  * Implements hook_preprocess_page().
  * Preprocess the pages.
  */
@@ -243,6 +233,21 @@ function mchammer_process_html(&$variables) {
  */
 function mail_template_access() {
   return user_access('administer mail templates');
+}
+
+/**
+ * List callback to show templates through CTools.
+ */
+function mchammer_mail_templates_list() {
+
+  $names = array();
+  ctools_include('export');
+  foreach(ctools_export_crud_load_all('mchammer_mail_templates') as $template) {
+    $names[$template->name] = $template->admin_title;
+  }
+
+  return $names;
+
 }
 
 /**

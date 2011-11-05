@@ -15,14 +15,29 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     return $op == 'edit' ? 'template:' . $item->{$this->plugin['export']['key']} : "template:::$op";
   }
 
+  /**
+   * Implements list_build_row().
+   */
   function list_build_row($item, &$form_state, $operations) {
+
     $operations['preview'] = array(
       'href' => 'mchammer/' . $item->name,
       'title' => t('Preview'),
     );
+
+    //admin/structure/mchammer/newsletter/add/basic/newsletter_example_1
+    $newsletter_plugin = ctools_get_export_ui('newsletter.export_ui');
+    $operations['create_newsletter'] = array(
+     'href' => 'admin/structure/mchammer/newsletter/add/' . $item->name . '/create-newsletter',
+     // 'href' => ctools_export_ui_plugin_menu_path($newsletter_plugin, 'add/basic/%ctools_export_ui', $item->name),
+     'title' => t('Create newsletter'),
+    );
     parent::list_build_row($item, $form_state, $operations);
   }
 
+  /**
+   * Implements edit_form().
+   */
   function edit_form(&$form, &$form_state) {
 
     // Get the basic edit form
@@ -158,6 +173,9 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $form_state['item']->display = $form_state['display'];
   }
 
+  /**
+   * Creates newsletter.
+   */
   function create_newsletter($mailtemplate_name) {
 
     ctools_include('content');

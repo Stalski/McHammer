@@ -10,6 +10,7 @@
  * - $content: An array of content, each item in the array is keyed to one
  *   panel of the layout. This layout supports the following sections:
  *   $content['middle']: The only panel in the layout.
+ *   
  */
 ?>
 <div class="panel-display panel-1col clearfix" <?php if (!empty($css_id)) { print "id=\"$css_id\""; } ?>>
