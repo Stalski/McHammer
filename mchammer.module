@@ -372,3 +372,20 @@ function mchammer_render_page_content($element) {
   return $output;
 
 }
+
+/**
+ * Submit callback
+ */
+function panels_edit_display_form_lock(&$form, &$form_state) {
+
+  if ($form_state['clicked_button']['#value'] == t('Lock')) {
+    $form_state['item']->locked = 1;
+  }
+  elseif ($form_state['clicked_button']['#value'] == t('Unlock')) {
+    $form_state['item']->locked = 0;
+  }
+
+  ctools_export_crud_save('mchammer_newsletters', $form_state['item']);
+  $form_state['redirect'] = 'admin/structure/mchammer/newsletter/list/montly_news/edit/content';
+
+}

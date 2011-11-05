@@ -230,6 +230,18 @@ class mchammer_newsletter_ui extends ctools_export_ui {
 
     $form = panels_edit_display_form($form, $form_state);
 
+    // Build up the lock button.
+    $form['buttons']['lock'] = array(
+      '#type' => 'submit',
+      '#value' => $form_state['item']->locked ? t('Unlock') : t('Lock'),
+      //'#attributes' => array('class' => array('use-ajax-submit')),
+      '#id' => 'panels-lock-button',
+      '#submit' => array('panels_edit_display_form_submit', 'panels_edit_display_form_lock'),
+    );
+    if ($form_state['item']->locked) {
+      drupal_set_message(t('This newsletter is locked and will not be regenerated untill you remove the lock and regenerate the content.'), 'warning');
+    }
+
     // Make sure the theme will work since our form id is different.
     $form['#theme'] = 'panels_edit_display_form';
 
