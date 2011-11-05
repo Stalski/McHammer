@@ -193,10 +193,11 @@ class mchammer_newsletter_ui extends ctools_export_ui {
 
     parent::edit_form_submit($form, $form_state);
 
-    $display = $this->get_display_from_template($form_state['values']['mail_template_name']);
-
-    $form_state['item']->display = $display;
-    $form_state['display'] = &$form_state['item']->display;
+    if (!$form_state['item']->locked) {
+      $display = $this->get_display_from_template($form_state['values']['mail_template_name']);
+      $form_state['item']->display = $display;
+      $form_state['display'] = &$form_state['item']->display;
+    }
 
   }
 
