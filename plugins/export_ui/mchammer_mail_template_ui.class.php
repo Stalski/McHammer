@@ -15,14 +15,29 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     return $op == 'edit' ? 'template:' . $item->{$this->plugin['export']['key']} : "template:::$op";
   }
 
+  /**
+   * Implements list_build_row().
+   */
   function list_build_row($item, &$form_state, $operations) {
+
     $operations['preview'] = array(
       'href' => 'mchammer/' . $item->name,
       'title' => t('Preview'),
     );
+
+    //admin/structure/mchammer/newsletter/add/basic/newsletter_example_1
+    $newsletter_plugin = ctools_get_export_ui('newsletter.export_ui');
+    $operations['create_newsletter'] = array(
+     'href' => 'admin/structure/mchammer/newsletter/add/' . $item->name . '/create-newsletter',
+     // 'href' => ctools_export_ui_plugin_menu_path($newsletter_plugin, 'add/basic/%ctools_export_ui', $item->name),
+     'title' => t('Create newsletter'),
+    );
     parent::list_build_row($item, $form_state, $operations);
   }
 
+  /**
+   * Implements edit_form().
+   */
   function edit_form(&$form, &$form_state) {
 
     // Get the basic edit form
@@ -151,7 +166,6 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $form_state['display_title'] = !empty($cache->display_title);
 
     $form = panels_edit_display_form($form, $form_state);
-dsm($form);
 
     // Make sure the theme will work since our form id is different.
     $form['#theme'] = 'panels_edit_display_form';
@@ -188,17 +202,15 @@ dsm($form);
 
         $pane = $template->display->content[$pid];
         // Generate a pane for every view result.
-        if ($pane->type == 'views') {
-          if ($view = views_get_view($pane->subtype)) {
-            $view->execute();
-            foreach ($view->result as $result) {
+        if ($pane->type == 'views' && $view = views_get_view($pane->subtype)) {
+          $view->execute();
+          foreach ($view->result as $result) {
 
-              $new_pane = panels_new_pane('node', 'node', TRUE);
-              $new_pane->configuration['nid'] = $result->nid;
-              $display->add_pane($new_pane, $pane->panel);
-              unset($new_pane);
+            $new_pane = panels_new_pane('node', 'node', TRUE);
+            $new_pane->configuration['nid'] = $result->nid;
+            $display->add_pane($new_pane, $pane->panel);
+            unset($new_pane);
 
-            }
           }
         }
         // Copy pane to the display.

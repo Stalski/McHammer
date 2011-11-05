@@ -1,6 +1,7 @@
 <?php
 
 $plugin = array(
+
   'schema' => 'mchammer_newsletters',
   'access' => 'administer newsletters',
 
@@ -22,17 +23,9 @@ $plugin = array(
       'basic' => t('Settings'),
       'content' => t('Content'),
     ),
-    // We have to add this form specially because it's invisible.
-    'forms' => array(
-      'move' => array(
-        'form id' => 'ctools_export_ui_edit_item_wizard_form',
-      ),
-    ),
   ),
 
   'handler' => array(
-//    'class' => 'mchammer_newsletter_ui',
-//    'parent' => 'mchammer_mail_template_ui',
     'class' => 'mchammer_newsletter_ui',
     'parent' => 'ctools_export_ui',
   ),
