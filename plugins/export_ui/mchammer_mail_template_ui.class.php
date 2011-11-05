@@ -193,17 +193,15 @@ class mchammer_mail_template_ui extends ctools_export_ui {
 
         $pane = $template->display->content[$pid];
         // Generate a pane for every view result.
-        if ($pane->type == 'views') {
-          if ($view = views_get_view($pane->subtype)) {
-            $view->execute();
-            foreach ($view->result as $result) {
+        if ($pane->type == 'views' && $view = views_get_view($pane->subtype)) {
+          $view->execute();
+          foreach ($view->result as $result) {
 
-              $new_pane = panels_new_pane('node', 'node', TRUE);
-              $new_pane->configuration['nid'] = $result->nid;
-              $display->add_pane($new_pane, $pane->panel);
-              unset($new_pane);
+            $new_pane = panels_new_pane('node', 'node', TRUE);
+            $new_pane->configuration['nid'] = $result->nid;
+            $display->add_pane($new_pane, $pane->panel);
+            unset($new_pane);
 
-            }
           }
         }
         // Copy pane to the display.
