@@ -206,7 +206,6 @@ class mchammer_newsletter_ui extends ctools_export_ui {
    */
   function edit_form_content(&$form, &$form_state) {
 
-    dsm($form_state['item']->display->content);
     ctools_include('ajax');
     ctools_include('plugins', 'panels');
     ctools_include('display-edit', 'panels');
