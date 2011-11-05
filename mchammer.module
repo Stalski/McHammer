@@ -356,7 +356,7 @@ function mchammer_render_page_content($element) {
       return drupal_render($element[$key]);
     }
     else {
-      $output = imagecrop_render_main_content($element[$key]);
+      $output = mchammer_render_page_content($element[$key]);
     }
 
     if (!empty($output)) {
