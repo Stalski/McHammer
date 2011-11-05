@@ -161,6 +161,12 @@ function mchammer_schema() {
         'not null' => TRUE,
         'description' => 'The subject of the newsletter.',
       ),
+      'locked' => array(
+        'type' => 'int',
+        'size' => 'tiny',
+        'default' => 0,
+        'no export' => TRUE,
+      ),
     ),
     'primary key' => array('mnid'),
     'unique keys' => array(
