@@ -220,7 +220,8 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     $cache_key = $this->edit_cache_get_key($form_state['item'], $form_state['form type']);
     $cache = panels_edit_cache_get('mchammer:' . $cache_key);
 
-    $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
+    // Start our own renderer to render the panes in the admin UI.
+    $form_state['renderer'] = panels_get_renderer_handler('mchammer_newsletter', $cache->display);
     $form_state['renderer']->cache = &$cache;
 
     $form_state['display'] = &$cache->display;
@@ -244,7 +245,7 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     }
 
     // Make sure the theme will work since our form id is different.
-    $form['#theme'] = 'panels_edit_display_form';
+    // $form['#theme'] = 'panels_edit_display_form';
 
   }
 
