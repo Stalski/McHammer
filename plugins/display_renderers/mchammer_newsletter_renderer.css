@@ -1,1 +1,13 @@
 @CHARSET "UTF-8";
+
+.mchammer-wrapper {
+  border: 1px dotted green;
+  margin: 0; padding: 0;
+}
+a.ctools-modal-ctools-mchammer-style {
+  background-color: green;
+  color: #FFF;
+  padding: 3px;
+  font-weight: bold;
+  margin: 0;
+}

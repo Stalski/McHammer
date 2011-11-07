@@ -222,6 +222,8 @@ class mchammer_newsletter_ui extends ctools_export_ui {
 
     // Start our own renderer to render the panes in the admin UI.
     $form_state['renderer'] = panels_get_renderer_handler('mchammer_newsletter', $cache->display);
+    $form_state['renderer']->mail_template_name = $form_state['item']->mail_template_name;
+
     $form_state['renderer']->cache = &$cache;
 
     $form_state['display'] = &$cache->display;

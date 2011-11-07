@@ -5,6 +5,8 @@
  */
 class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
 
+  public $mail_template_name = '';
+
   /**
    * Implements panels_renderer_editor::add_meta()
    */
@@ -29,7 +31,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
         $setting['mchammer'][$object->configuration['source']] = $object->configuration['source'];
       }
       foreach ($setting['mchammer'] as $name => $group) {
-        $setting['mchammer'][$name] = ctools_modal_text_button(t('Rerender'), 'mchammer/nojs/rerender/' . $group, t('Rerender'),  'ctools-modal-ctools-mchammer-style');
+        $setting['mchammer'][$name] = ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->mail_template_name . '/' . $group, t('Rerender'),  'ctools-modal-ctools-mchammer-style');
       }
       drupal_add_js($setting, 'setting');
     }
@@ -39,9 +41,21 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
   /**
    * Implements panels_renderer_editor::render()
    */
-  function render() {
-    $output = parent::render();
-    return '<div id="panels-mchammer-display-' . $this->clean_key . '" class="panels-mchammer-display-container">' . $output . '</div>';
+  function render($pane_name = NULL) {
+    $output = '';
+
+    if (!isset($pane_name)) {
+      $output = parent::render();
+      $output = '<div id="panels-mchammer-display-' . $this->clean_key . '" class="panels-mchammer-display-container">' . $output . '</div>';
+    }
+    else {
+      // Rerender the panes with the same pane_name.
+      foreach ($this->display->content as $pid => $pane) {
+        $output .= $this->render_pane($pane);
+      }
+
+    }
+    return $output;
   }
 
   /**
@@ -91,7 +105,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
 
     // Add custom classes to trigger some contextual information with js & css style.
     list($pane_type, $pane_name) = explode(":", $pane->configuration['source']);
-    $class .= ' mchammer-process mchammer-' . $pane_type . '-' . $pane_name . ' mchammer-name-' . $pane_name . ' mchammer-type-' . $pane_type;
+    $class .= ' mchammer-process mchammer-' . $pane_type . '--' . $pane_name;
 
     $output = '<div class="' . $class . '" id="panel-pane-' . $pane->pid . '">';
 

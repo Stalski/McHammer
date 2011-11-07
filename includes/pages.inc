@@ -22,7 +22,7 @@ function mchammer_newsletter_page($newsletter) {
  * Ajax callback to rerender multiple panes derived from a mail
  * template pane.
  */
-function mchammer_modal_rerender($js, $pane_name) {
+function mchammer_modal_rerender($js, $template_name, $pane_name) {
 
   if ($js) {
     ctools_include('modal');
@@ -32,24 +32,24 @@ function mchammer_modal_rerender($js, $pane_name) {
   $form_state = array(
     'title' => t('Are you sure you want to rerender this pane?'),
     'ajax' => TRUE,
+    'template_name' => $template_name,
     'pane_name' => $pane_name,
   );
 
-  // Send this all off to our form. This is like drupal_get_form only wizardy.
-  $output = ctools_modal_form_wrapper('mchammer_modal_rerender_confirm', $form_state);
-
   // Fall back if $js is not set.
   if (!$js) {
-
     return drupal_get_form('mchammer_modal_rerender_confirm', $pane_name);
-
   }
   else {
 
+    // Send this all off to our form. This is like drupal_get_form only wizardy.
+    $output = ctools_modal_form_wrapper('mchammer_modal_rerender_confirm', $form_state);
+
     if (!empty($form_state['executed'])) {
       $output = array();
+      $content  = mchammer_modal_rerender_pane_group($template_name, $pane_name);
+      $output[] = ajax_command_replace('div#mchammer-' . str_replace(":", "--", $pane_name), $content);
       $output[] = ctools_modal_command_dismiss();
-      //$output[] = ajax_command_invoke('.heartbeat-activity-' . $uaid, 'heartbeatRemoveElement', array($uaid, t('Activity deleted.')));
     }
 
     print ajax_render($output);
@@ -81,7 +81,7 @@ function mchammer_modal_rerender_confirm($form, $form_state) {
     t('Are you sure you want to rerender this pane?'),
     $path,
     t('This action cannot be undone.'),
-    t('Delete'),
+    t('Rerender'),
     t('Cancel'));
 
   return $output;
@@ -91,13 +91,23 @@ function mchammer_modal_rerender_confirm($form, $form_state) {
 /**
  * Handler for wipe confirmation
  */
-function heartbeat_delete_log_confirm_submit($form, &$form_state) {
+function mchammer_modal_rerender_pane_group($template_name, $pane_name) {
 
-  // Set the flag so the form knows it's been executed.
-  $form_state['executed'] = TRUE;
+  $mailtemplate_ui = new mchammer_mail_template_ui();
+  $display = $mailtemplate_ui->create_newsletter($template_name);
 
-  if (!empty($form_state['pane_name'])) {
-  // act
+  $new_display = clone($display);
+  $new_display->content = array();
+  foreach ($display->content as $key => $content) {
+    if ($content->configuration['source'] == $pane_name) {
+      $new_display->content[$key] = $content;
+    }
   }
+
+  ctools_include('ajax');
+  ctools_include('plugins', 'panels');
+  ctools_include('display-edit', 'panels');
+  $renderer = panels_get_renderer_handler('mchammer_newsletter', $new_display);
+  return $renderer->render($pane_name);
 
 }

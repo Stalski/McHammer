@@ -1,48 +1,47 @@
 // Ensure the $ alias is owned by jQuery.
 (function($) {
 
+DrupalPanelsMcHammer = DrupalPanelsMcHammer || {};
+
 // Onload is enough for this s
 $(function() {
-  var paneGrouper = new DrupalPanelsMcHammer();
-  paneGrouper.bindAutoPaneGrouping();
+  DrupalPanelsMcHammer.detectGroups($('.panels-mchammer-display-container'));
 });
 
-/**
- * Base object (class) definition for McHammer Editor.
- */
-function DrupalPanelsMcHammer() {
-  
-  var mchammer = this;
 
-  this.panes = new Array();
+//
+///**
+// * Bind links that will open modals to the appropriate function.
+// */
+//Drupal.behaviors.McHammer = {
+//  attach: function(context) {
+//    DrupalPanelsMcHammer.detectGroups(context);
+//  }
+//};
+
+DrupalPanelsMcHammer.panes = new Array();
+
+DrupalPanelsMcHammer.detectGroups = function(container) {
   
-  this.container = $('.panels-mchammer-display-container');
-  
-  /**
-   * Binds the panes together in pane-groups.
-   */
-  this.bindAutoPaneGrouping = function() {
-    
-    //mchammer-views-pane-17
-    for (n in Drupal.settings.mchammer) {
-      var className = 'mchammer-' + n.replace(":", "-");
+  for (n in Drupal.settings.mchammer) {
+    var className = 'mchammer-' + n.replace(":", "--");
+    if ($('.' + className, container).hasClass('mchammer-process')) {
       var group = {
-        id: className, 
+        id: className,
         panes: $('.' + className).removeClass('mchammer-process').addClass('mchammer-processed'),
         settings: Drupal.settings.mchammer[n]
       };
-      mchammer.panes.push(group);
+      DrupalPanelsMcHammer.panes.push(group);
     }
-    
-    // Wrap all elements that belong together.
-    for (n in mchammer.panes) {
-      $('.' + mchammer.panes[n].id).wrapAll($('<div id="' +  mchammer.panes[n].id + '"></div>'));
-      $('#' +  mchammer.panes[n].id).prepend(mchammer.panes[n].settings);
-    }
-    
-    Drupal.attachBehaviors(this.container);
-    
-  };
+  }
+  
+  // Wrap all elements that belong together.
+  for (n in DrupalPanelsMcHammer.panes) {
+    $('.' + DrupalPanelsMcHammer.panes[n].id).wrapAll($('<div class="mchammer-wrapper" id="' +  DrupalPanelsMcHammer.panes[n].id + '"></div>'));
+    $('#' +  DrupalPanelsMcHammer.panes[n].id).prepend(DrupalPanelsMcHammer.panes[n].settings);
+  }
+  
+  Drupal.attachBehaviors(DrupalPanelsMcHammer.panes[n].settings);
   
 };
 
