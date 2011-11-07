@@ -6,6 +6,7 @@
 class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
 
   public $mail_template_name = '';
+  public $pane_groups = array();
 
   /**
    * Implements panels_renderer_editor::add_meta()
@@ -28,11 +29,9 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
       // Create the links for the modal to re-render the panes.
       $setting = array('mchammer' => array());
       foreach ($this->display->content as $object) {
-        $setting['mchammer'][$object->configuration['source']] = $object->configuration['source'];
+        $this->pane_groups[$object->configuration['source']] = str_replace(":" , "--", $object->configuration['source']);
       }
-      foreach ($setting['mchammer'] as $name => $group) {
-        $setting['mchammer'][$name] = ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->mail_template_name . '/' . $group, t('Rerender'),  'ctools-modal-ctools-mchammer-style');
-      }
+      $setting['mchammer'] = $this->pane_groups;
       drupal_add_js($setting, 'setting');
     }
 
@@ -47,6 +46,11 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
     if (!isset($pane_name)) {
       $output = parent::render();
       $output = '<div id="panels-mchammer-display-' . $this->clean_key . '" class="panels-mchammer-display-container">' . $output . '</div>';
+      $output .= '<div id="panels-mchammer-display-links">';
+      foreach ($this->pane_groups as $name => $group) {
+        $output .= ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->mail_template_name . '/' . $name, t('Rerender'),  'ctools-modal-ctools-mchammer-style mchammer-style-' . $group);
+      }
+      $output .= '</div>';
     }
     else {
       // Rerender the panes with the same pane_name.
