@@ -20,7 +20,8 @@ interface McHammerExtractorInterface {
 }
 
 /**
- * Factory class for McHammerExtractor.
+ * @class McHammerExtractorFactory
+ * Factory class for getting the correct McHammerExtractor.
  */
 class McHammerExtractorFactory {
 
@@ -56,6 +57,11 @@ class McHammerExtractor {
    */
   protected $sourcePane;
 
+  /**
+   * Construct a new McHammerExtractor
+   * @param $sourceDisplay
+   * Display where the exctration is based on.
+   */
   public function __construct($sourceDisplay) {
     $this->sourceDisplay = $sourceDisplay;
   }
