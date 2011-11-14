@@ -43,6 +43,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
   function render($pane_name = NULL) {
     $output = '';
 
+    // Default render for all panes.
     if (!isset($pane_name)) {
       $output = parent::render();
       $output = '<div id="panels-mchammer-display-' . $this->clean_key . '" class="panels-mchammer-display-container">' . $output . '</div>';
@@ -51,15 +52,21 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
         $output .= ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->mail_template_name . '/' . $name, t('Rerender'),  'ctools-modal-ctools-mchammer-style mchammer-style-' . $group);
       }
       $output .= '</div>';
+      return $output;
     }
+    // Override to render a set of panes.
     else {
       // Rerender the panes with the same pane_name.
+      $output .= '<div id="mchammer-' . $pane_name . '" class="mchammer-wrapper">';
       foreach ($this->display->content as $pid => $pane) {
         $output .= $this->render_pane($pane);
       }
-
+      $output .= '</div>';
+      $group = new stdClass();
+      $group->content = $output;
+      $group->pids = array_keys($this->display->content);
+      return $group;
     }
-    return $output;
   }
 
   /**

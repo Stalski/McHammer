@@ -249,6 +249,7 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     // Make sure the theme will work since our form id is different.
     // $form['#theme'] = 'panels_edit_display_form';
 
+    // $form['panel']['pane']['middle']['#default_value'] ---> panel[pane][middle]
   }
 
   /**

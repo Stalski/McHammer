@@ -10,13 +10,13 @@
  * - $content: An array of content, each item in the array is keyed to one
  *   panel of the layout. This layout supports the following sections:
  *   $content['middle']: The only panel in the layout.
- *   
+ *
  */
 ?>
 <table>
   <tr>
     <td>
-    <?php print $content['middle']; ?>
+    <?php mchammer_print($content, 'middle'); ?>
     </td>
   </tr>
 </table>

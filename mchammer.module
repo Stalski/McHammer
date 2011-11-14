@@ -386,3 +386,15 @@ function panels_edit_display_form_lock(&$form, &$form_state) {
   $form_state['redirect'] = 'admin/structure/mchammer/newsletter/list/montly_news/edit/content';
 
 }
+
+/**
+ * Theme utility function to print content regions.
+ */
+function mchammer_print($content, $target_region) {
+  foreach ($content as $key => $text) {
+    list($region, $source_name) = explode("::", $key);
+    if ($region == $target_region) {
+      print $text;
+    }
+  }
+}
