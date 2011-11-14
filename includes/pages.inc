@@ -42,13 +42,16 @@ function mchammer_modal_rerender($js, $template_name, $pane_name) {
   }
   else {
 
+    $form_state['wtf'] = 'jow dude';
     // Send this all off to our form. This is like drupal_get_form only wizardy.
     $output = ctools_modal_form_wrapper('mchammer_modal_rerender_confirm', $form_state);
 
     if (!empty($form_state['executed'])) {
       $output = array();
-      $content  = mchammer_modal_rerender_pane_group($template_name, $pane_name);
-      $output[] = ajax_command_replace('div#mchammer-' . str_replace(":", "--", $pane_name), $content);
+      $group  = mchammer_modal_rerender_pane_group($template_name, $pane_name, $form_state);
+      $output[] = ajax_command_replace('div#mchammer-' . str_replace(":", "--", $pane_name), $group->content);
+      // @TODO The panels should know about the newly rerendered panes. Fix this one way or another
+      //$output[] = ajax_command_invoke('input[name="panel[pane][middle]"]', 'mcHammerUpdatePanes', array('pane_name' => $pane_name, 'template_name' => $template_name, 'pids' => $group->pids));
       $output[] = ctools_modal_command_dismiss();
     }
 
@@ -76,6 +79,10 @@ function mchammer_modal_rerender_confirm($form, $form_state) {
   if (!empty($form_state['pane_name'])) {
     $form['#pane_name'] = $form_state['pane_name'];
   }
+  $form['#template_name'] = $form_state['template_name'];
+  if (!empty($form_state['template_name'])) {
+    $form['#template_name'] = $form_state['template_name'];
+  }
 
   $output = confirm_form($form,
     t('Are you sure you want to rerender this pane?'),
@@ -91,7 +98,7 @@ function mchammer_modal_rerender_confirm($form, $form_state) {
 /**
  * Handler for wipe confirmation
  */
-function mchammer_modal_rerender_pane_group($template_name, $pane_name) {
+function mchammer_modal_rerender_pane_group($template_name, $pane_name, &$form_state) {
 
   $mailtemplate_ui = new mchammer_mail_template_ui();
   $display = $mailtemplate_ui->create_newsletter($template_name);
@@ -108,6 +115,10 @@ function mchammer_modal_rerender_pane_group($template_name, $pane_name) {
   ctools_include('plugins', 'panels');
   ctools_include('display-edit', 'panels');
   $renderer = panels_get_renderer_handler('mchammer_newsletter', $new_display);
+
+  $form_state['display'] = $new_display;
+
+  $form_state['wtf'] = 'true, dude';
   return $renderer->render($pane_name);
 
 }

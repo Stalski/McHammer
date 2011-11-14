@@ -1,7 +1,6 @@
 // Ensure the $ alias is owned by jQuery.
 (function($) {
 
-
 /**
  * Bind links that will open modals to the appropriate function.
  */
@@ -51,6 +50,15 @@ DrupalPanelsMcHammer.detectGroups = function(container) {
     }
   }
 };
+
+///**
+// * jQuery.mcHammerUpdatePanes().
+// * Remove element.
+// */
+//$.fn.mcHammerUpdatePanes = function (args) {
+//  console.log(args);
+//  console.warn(this[0]);
+//};
 
 /**
  * Wraps and adds the link to the pane-groups.
