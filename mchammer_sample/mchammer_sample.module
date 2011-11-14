@@ -1,0 +1,16 @@
+<?php
+/**
+ * @file
+ * Sample module for mchammer template.
+ * Templates can also be created inside your theme.
+ *
+ */
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function mchammer_sample_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'panels' && $plugin == 'layouts') {
+    return "plugins/$plugin";
+  }
+}

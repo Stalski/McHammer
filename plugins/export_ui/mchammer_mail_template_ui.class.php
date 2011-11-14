@@ -208,7 +208,51 @@ class mchammer_mail_template_ui extends ctools_export_ui {
 
       }
 
+      }
+
+      return $display;
+
     }
+
+  /**
+   * Revert the newsletter display his panes from a given source.
+   * @param $mailtemplate_name Machine name from the panel display to revert to.
+   * @param $display_cache_key Panels cache key from newsletter display
+   * @param $source_key Key from the source panes to be reverted.
+   * @return The reverted display.
+   */
+  function revert_newsletter_pane($mailtemplate_name, $display_cache_key, $source_key) {
+
+    ctools_include('content');
+
+    // Load the current display from cache
+    $cache = panels_edit_cache_get($display_cache_key);
+    $display = $cache->display;
+
+    // Load the original mail template
+    $template = mchammer_mail_template_load($mailtemplate_name);
+
+    // Remove the panes from the source to revert.
+    foreach ($display->content as $key => $content) {
+      if ($content->configuration['source'] == $source_key) {
+        $pane = $display->content[$key];
+        unset($display->panels[$pane->panel][$key]);
+        unset($display->content[$key]);
+      }
+    }
+
+    list(, $pane_key) = explode(':', $source_key);
+    list(, $pid) = explode('-', $pane_key);
+
+    $pane = $template->display->content[$pid];
+
+    $extractor = McHammerExtractorFactory::getExtractor($pane->type, $template->display);
+    $extractor->setSourcePane($pane);
+    $extractor->extract($display);
+
+    $this->cache->display = $display;
+
+    panels_edit_cache_set($this->cache);
 
     return $display;
 

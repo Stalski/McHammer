@@ -49,7 +49,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
       $output = '<div id="panels-mchammer-display-' . $this->clean_key . '" class="panels-mchammer-display-container">' . $output . '</div>';
       $output .= '<div id="panels-mchammer-display-links">';
       foreach ($this->pane_groups as $name => $group) {
-        $output .= ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->mail_template_name . '/' . $name, t('Rerender'),  'ctools-modal-ctools-mchammer-style mchammer-style-' . $group);
+        $output .= ctools_modal_text_button(t('Rerender @name', array('@name' => $name)), 'mchammer/nojs/rerender/' . $this->display->cache_key . '/' . $this->mail_template_name . '/' . $name, t('Rerender'),  'ctools-modal-ctools-mchammer-style mchammer-style-' . $group);
       }
       $output .= '</div>';
       return $output;

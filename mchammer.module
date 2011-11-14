@@ -46,10 +46,10 @@ function mchammer_menu() {
   );
 
   // Ajax driven callback to delete activity
-  $items['mchammer/%ctools_js/rerender/%/%'] = array(
+  $items['mchammer/%ctools_js/rerender/%/%/%'] = array(
     'title' => 'Rerender mail template pane',
     'page callback' => 'mchammer_modal_rerender',
-    'page arguments' => array(1, 3, 4),
+    'page arguments' => array(1, 3, 4, 5),
     'access arguments' => array('view all newsletters'),
     'file' => 'includes/pages.inc',
     'type' => MENU_CALLBACK,

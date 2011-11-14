@@ -1,0 +1,5 @@
+name = McHammer example templates
+description = Contains example templates for mchammer.
+core = 7.x
+
+dependencies[] = mchammer
