@@ -282,9 +282,9 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $extractor->setSourcePane($pane);
     $extractor->extract($display);
 
-    $this->cache->display = $display;
+    $cache->display = $display;
 
-    panels_edit_cache_set($this->cache);
+    panels_edit_cache_set($cache);
 
     return $display;
 
