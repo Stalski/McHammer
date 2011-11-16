@@ -139,6 +139,38 @@ class mchammer_mail_template_ui extends ctools_export_ui {
   }
 
   /**
+   * When a layout is changed, the user is given the opportunity to move content.
+   */
+  function edit_form_move(&$form, &$form_state) {
+
+    $form_state['display'] = &$form_state['item']->display;
+    $form_state['layout'] = $form_state['item']->temp_layout;
+
+    ctools_include('common', 'panels');
+    ctools_include('display-layout', 'panels');
+    ctools_include('plugins', 'panels');
+
+    // Tell the Panels form not to display buttons.
+    $form_state['no buttons'] = TRUE;
+
+    // Change the #id of the form so the CSS applies properly.
+    $form = panels_change_layout($form, $form_state);
+
+    // This form is outside the normal wizard list, so we need to specify the
+    // previous/next forms.
+    $form['buttons']['previous']['#next'] = 'layout';
+    $form['buttons']['next']['#next'] = 'content';
+
+  }
+
+  /**
+   * Save the changed selection of layout.
+   */
+  function edit_form_move_submit(&$form, &$form_state) {
+    panels_change_layout_submit($form, $form_state);
+  }
+
+  /**
    * Step 3 of wizard: Choose the content.
    */
   function edit_form_content(&$form, &$form_state) {
