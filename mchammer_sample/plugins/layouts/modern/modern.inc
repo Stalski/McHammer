@@ -10,4 +10,5 @@ $plugin = array(
     'middle' => t('Middle column'),
   ),
   'module' => 'mchammer', // mchammer as module is required
+  'html-mchammer' => 'html-mchammer-modern', // html.tpl.php for mchammer
 );

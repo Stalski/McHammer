@@ -230,7 +230,7 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     $form_state['content_types'] = $cache->content_types;
     // Tell the Panels form not to display buttons.
     $form_state['no buttons'] = TRUE;
-    $form_state['display_title'] = !empty($cache->display_title);
+    $form_state['display_title'] = FALSE;
 
     $form = panels_edit_display_form($form, $form_state);
 

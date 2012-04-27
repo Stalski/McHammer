@@ -3,11 +3,11 @@
 /**
  * Renderer class for all Newsletter behavior.
  */
-class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
+class panels_renderer_mchammer_newsletter extends panels_renderer_mchammer {
 
   public $mail_template_name = '';
-  public $source_panes = array();
-  private $source_display = NULL;
+  protected $source_panes = array();
+  protected $source_display = NULL;
 
   /**
    * Prepare the attached display for rendering.
@@ -72,7 +72,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
       ctools_include('cleanstring');
       ctools_modal_add_js();
 
-      ctools_add_js('mchammer_newsletter_renderer', 'mchammer', 'plugins/display_renderers');
+      //ctools_add_js('mchammer_newsletter_renderer', 'mchammer', 'plugins/display_renderers');
       ctools_add_css('mchammer_newsletter_renderer', 'mchammer', 'plugins/display_renderers');
 
       $this->clean_key = ctools_cleanstring($this->display->cache_key);
@@ -157,7 +157,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_editor {
       list($pane_type, $pane_name) = explode(":", $pane->configuration['source']);
       $class .= ' mchammer-process mchammer-' . $pane_type . '--' . $pane_name;
       if (isset($this->source_panes[$pane->configuration['source']])) {
-        $title .= ' (original => ' . $this->source_panes[$pane->configuration['source']] . ')';
+        $title .= ' (source: ' . $this->source_panes[$pane->configuration['source']] . ')';
       }
     }
 

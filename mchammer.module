@@ -23,6 +23,16 @@ function mchammer_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
+  $items['admin/structure/mchammer/settings'] = array(
+    'title' => 'MC HAMMER settings',
+    'description' => 'Configure general settings from MC Hammer',
+    'access arguments' => array('administer mail templates'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('mchammer_settings_form'),
+    'file' => 'includes/admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
   $items['mchammer/%mchammer_mail_template'] = array(
     'title' => 'Mail template',
     'access arguments' => array('preview mail templates'),
@@ -63,7 +73,8 @@ function mchammer_menu() {
  * Implements hook_theme().
  */
 function mchammer_theme() {
-  return array(
+
+  $theme = array(
     'page-mchammer' => array(
       'variables' => array(),
       'file' => 'includes/theme.inc',
@@ -71,7 +82,8 @@ function mchammer_theme() {
     ),
     'html-mchammer' => array(
       'variables' => array(),
-      'template' => 'templates/mchammer-newsletter',
+      'template' => 'html-mchammer',
+      'path' => drupal_get_path('module', 'mchammer') . '/templates',
     ),
     'panels_pane_mchammer' => array(
       'template' => 'panels-pane-mchammer',
@@ -79,6 +91,21 @@ function mchammer_theme() {
       'variables' => array('output' => array(), 'pane' => array(), 'display' => array()),
     ),
   );
+
+  ctools_include('plugins', 'panels');
+  $layouts = panels_get_layouts();
+  foreach ($layouts as $name => $data) {
+    if (isset($data['html-mchammer'])) {
+      $theme['html-mchammer-' . $data['theme']] = array(
+        'template' => $data['html-mchammer'],
+        'path' => $data['path'],
+        'variables' => array(),
+      );
+    }
+  }
+
+  return $theme;
+
 }
 
 /**
@@ -115,6 +142,15 @@ function mchammer_ctools_plugin_directory($module, $plugin) {
   elseif ($module == 'panels' && !empty($plugin)) {
     return "plugins/$plugin";
   }
+}
+
+/**
+ * Implements hook_form_{panels_edit_display_settings_form}_alter().
+ */
+function form_panels_edit_display_settings_form_alter(&$form, $form_state) {
+
+  dsm($form);
+
 }
 
 /**
@@ -227,7 +263,15 @@ function mchammer_process_html(&$variables) {
   if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
     $variables['scripts'] = '';
     $variables['styles'] = '';
-    $variables['theme_hook_suggestion'] = 'html-mchammer';
+    $newsletter = mchammer_newsletter_load(arg(2));
+    $layout = panels_get_layout($newsletter->display->layout);
+
+    if (isset($layout['html-mchammer'])) {
+      array_unshift($variables['theme_hook_suggestions'], 'html-mchammer-' . $layout['theme']);
+    }
+
+    array_unshift($variables['theme_hook_suggestions'], 'html-mchammer');
+
   }
 
 }

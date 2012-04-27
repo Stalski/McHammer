@@ -16,7 +16,8 @@
 <table>
   <tr>
     <td>
-    <?php mchammer_print($content, 'middle'); ?>
+    <?php //mchammer_print($content, 'middle'); ?>
+    <?php print $content['middle'] ?>
     </td>
   </tr>
 </table>

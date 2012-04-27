@@ -32,3 +32,9 @@ function mchammer_page($variables) {
   return $output;
 
 }
+
+function mchammer_html($variables) {
+
+  return ':)';
+
+}
