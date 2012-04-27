@@ -33,11 +33,11 @@ function mchammer_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['mchammer/%mchammer_mail_template_preview'] = array(
+  $items['mchammer/template/%mchammer_mail_template_preview'] = array(
     'title' => 'Mail template',
     'access arguments' => array('preview mail templates'),
     'page callback' => 'mchammer_mail_template_page',
-    'page arguments' => array(1),
+    'page arguments' => array(2),
     'file' => 'includes/pages.inc',
     'type' => MENU_CALLBACK,
   );
@@ -233,7 +233,7 @@ function mchammer_panels_cache_break_lock($key, $cache) {
  */
 function mchammer_preprocess_page(&$variables) {
 
-  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+  if (arg(0) == 'mchammer' && (arg(1) == 'newsletter' || arg(1) == 'template')) {
     $variables['theme_hook_suggestion'] = 'page-mchammer';
     include_once(dirname(__FILE__) . '/includes/theme.inc');
   }
@@ -247,17 +247,25 @@ function mchammer_preprocess_page(&$variables) {
  */
 function mchammer_process_html(&$variables) {
 
-  if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
+  $type = arg(1);
+  if (arg(0) == 'mchammer' && ($type == 'newsletter' || $type == 'template')) {
+
     $variables['scripts'] = '';
     $variables['styles'] = '';
-    $newsletter = mchammer_newsletter_preview_load(arg(2));
-    $layout = panels_get_layout($newsletter->display->layout);
 
-    if (isset($layout['html-mchammer'])) {
-      array_unshift($variables['theme_hook_suggestions'], 'html-mchammer-' . $layout['theme']);
+    $object = ($type == 'newsletter') ? mchammer_newsletter_preview_load(arg(2)) : mchammer_mail_template_preview_load(arg(2));
+
+    if ($object) {
+
+      $layout = panels_get_layout($object->display->layout);
+
+      if (isset($layout['html-mchammer'])) {
+        array_unshift($variables['theme_hook_suggestions'], 'html-mchammer-' . $layout['theme']);
+      }
+
+      array_unshift($variables['theme_hook_suggestions'], 'html-mchammer');
+
     }
-
-    array_unshift($variables['theme_hook_suggestions'], 'html-mchammer');
 
   }
 
@@ -326,14 +334,12 @@ function mchammer_newsletter_save(&$mail_template) {
  */
 function mchammer_mail_template_preview_load($id) {
 
-  // When : occures in id. We received a cache key from a new template.
-  if (strpos(':', $id)) {
-    $cache = panels_edit_cache_get($id);
+  // If the id is 'new'. Get it from cache
+  if ($id == 'new') {
+    return panels_edit_cache_get('mchammer:template:::add');
   }
   else {
-    die('id:' . $id);
-    $test = mchammer_ctools_crud_load($id, 'mchammer_mail_templates');
-    print_R($test);die();
+    return mchammer_mail_template_load($id);
   }
 
 }
@@ -343,7 +349,7 @@ function mchammer_mail_template_preview_load($id) {
  */
 function mchammer_newsletter_preview_load($id) {
 
-  // When : occures in id. We received a cache key from a new template.
+  // If the id is 'new'. Get it from cache
   if ($id == 'new') {
     return panels_edit_cache_get('mchammer:newsletter:::add');
   }

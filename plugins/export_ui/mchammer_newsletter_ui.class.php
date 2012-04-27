@@ -176,11 +176,10 @@ class mchammer_newsletter_ui extends ctools_export_ui {
   function edit_form_basic_validate($form, &$form_state) {
 
     parent::edit_form_validate($form, $form_state);
-    if (empty($form_state['values']['mail_template_name'])) {
-      form_error($form['mail_template_name'], t('A newsletter must be derived from a dynamic mail template.'));
-    }
-    if (preg_match("/[^A-Za-z0-9 ]/", $form_state['values']['category'])) {
-      form_error($form['category'], t('Categories may contain only alphanumerics or spaces.'));
+
+    // 'add' is a pre-reserved machine name
+    if ($form_state['values']['name'] == 'add') {
+      form_set_error('name', t("'add' can't be used as a title"));
     }
 
   }
@@ -260,6 +259,9 @@ class mchammer_newsletter_ui extends ctools_export_ui {
       drupal_set_message(t('This newsletter is locked and will not be regenerated untill you remove the lock and regenerate the content.'), 'warning');
     }
 
+    // Make sure the theme will work since our form id is different.
+    $form['#theme'] = 'panels_edit_display_form';
+
   }
 
   /**
@@ -337,6 +339,7 @@ class mchammer_newsletter_ui extends ctools_export_ui {
       '#default_value' => $form_state['item']->mail_template_name,
       '#title' => t('Mail template'),
       '#description' => t('Mail template this newsletter should be derived from'),
+      '#required' => TRUE,
     );
 
     $form['title']['#title'] = t('Title');
