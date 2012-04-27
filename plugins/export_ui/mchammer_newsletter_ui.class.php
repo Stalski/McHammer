@@ -231,8 +231,14 @@ class mchammer_newsletter_ui extends ctools_export_ui {
     // Tell the Panels form not to display buttons.
     $form_state['no buttons'] = TRUE;
     $form_state['display_title'] = FALSE;
+    $form_state['no preview'] = TRUE;
 
     $form = panels_edit_display_form($form, $form_state);
+
+    // Remove the update button
+    if (isset($form['buttons']['next'])) {
+      unset($form['buttons']['next']);
+    }
 
     // Build up the lock button.
     $form['buttons']['lock'] = array(
@@ -242,14 +248,18 @@ class mchammer_newsletter_ui extends ctools_export_ui {
       '#id' => 'panels-lock-button',
       '#submit' => array('panels_edit_display_form_submit', 'panels_edit_display_form_lock'),
     );
+
+    $id = $form_state['form type'] == 'add' ? 'new' : $form_state['item']->name;
+
+    $form['buttons']['preview'] = array(
+      '#markup' => l(t('Preview'), 'mchammer/newsletter/' . $id, array('attributes' => array('class' => 'button', 'target' => '_blank'))),
+      '#id' => 'panels-preview-button',
+    );
+
     if ($form_state['item']->locked) {
       drupal_set_message(t('This newsletter is locked and will not be regenerated untill you remove the lock and regenerate the content.'), 'warning');
     }
 
-    // Make sure the theme will work since our form id is different.
-    // $form['#theme'] = 'panels_edit_display_form';
-
-    // $form['panel']['pane']['middle']['#default_value'] ---> panel[pane][middle]
   }
 
   /**
@@ -320,14 +330,6 @@ class mchammer_newsletter_ui extends ctools_export_ui {
 
     // Get the basic edit form
     parent::edit_form($form, $form_state);
-
-    $form['category'] = array(
-      '#type' => 'textfield',
-      '#size' => 24,
-      '#default_value' => $form_state['item']->category,
-      '#title' => t('Category'),
-      '#description' => t("The category that this newsletter template will be grouped into on the Add Content form. Only upper and lower-case alphanumeric characters are allowed."),
-    );
 
     $form['mail_template_name'] = array(
       '#type' => 'select',

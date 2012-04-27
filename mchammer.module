@@ -33,7 +33,7 @@ function mchammer_menu() {
     'type' => MENU_NORMAL_ITEM,
   );
 
-  $items['mchammer/%mchammer_mail_template'] = array(
+  $items['mchammer/%mchammer_mail_template_preview'] = array(
     'title' => 'Mail template',
     'access arguments' => array('preview mail templates'),
     'page callback' => 'mchammer_mail_template_page',
@@ -42,11 +42,7 @@ function mchammer_menu() {
     'type' => MENU_CALLBACK,
   );
 
-  // Avoiding the possibility to have the same machine name.
-  // @TODO check if this is the best way. Maybe it's better to
-  // check on edit_form_validation in newsletter plugin to make sure
-  // it does not exist in mail templates AND newsletters.
-  $items['mchammer/newsletter/%mchammer_newsletter'] = array(
+  $items['mchammer/newsletter/%mchammer_newsletter_preview'] = array(
     'title' => 'Newsletter',
     'access arguments' => array('view all newsletters'),
     'page callback' => 'mchammer_newsletter_page',
@@ -142,15 +138,6 @@ function mchammer_ctools_plugin_directory($module, $plugin) {
   elseif ($module == 'panels' && !empty($plugin)) {
     return "plugins/$plugin";
   }
-}
-
-/**
- * Implements hook_form_{panels_edit_display_settings_form}_alter().
- */
-function form_panels_edit_display_settings_form_alter(&$form, $form_state) {
-
-  dsm($form);
-
 }
 
 /**
@@ -263,7 +250,7 @@ function mchammer_process_html(&$variables) {
   if (arg(0) == 'mchammer' && arg(1) == 'newsletter') {
     $variables['scripts'] = '';
     $variables['styles'] = '';
-    $newsletter = mchammer_newsletter_load(arg(2));
+    $newsletter = mchammer_newsletter_preview_load(arg(2));
     $layout = panels_get_layout($newsletter->display->layout);
 
     if (isset($layout['html-mchammer'])) {
@@ -332,6 +319,38 @@ function mchammer_newsletter_load($name) {
  */
 function mchammer_newsletter_save(&$mail_template) {
   return mchammer_ctools_crud_save($mail_template, 'mchammer_newsletters', 'mnid');
+}
+
+/**
+ * Load a preview mail template.
+ */
+function mchammer_mail_template_preview_load($id) {
+
+  // When : occures in id. We received a cache key from a new template.
+  if (strpos(':', $id)) {
+    $cache = panels_edit_cache_get($id);
+  }
+  else {
+    die('id:' . $id);
+    $test = mchammer_ctools_crud_load($id, 'mchammer_mail_templates');
+    print_R($test);die();
+  }
+
+}
+
+/**
+ * Load a mchammer newsletter.
+ */
+function mchammer_newsletter_preview_load($id) {
+
+  // When : occures in id. We received a cache key from a new template.
+  if ($id == 'new') {
+    return panels_edit_cache_get('mchammer:newsletter:::add');
+  }
+  else {
+    return mchammer_newsletter_load($id);
+  }
+
 }
 
 /**

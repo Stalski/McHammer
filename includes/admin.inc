@@ -33,7 +33,7 @@ function mchammer_settings_form() {
   }
 
   $form['mchammer_panel_categories'] = array(
-    '#title' => t('Panel categories that are enabled for MC Hammer'),
+    '#title' => t('Panel categories that are enabled for newsletters'),
     '#type' => 'checkboxes',
     '#options' => $options,
     '#default_value' => variable_get('mchammer_panel_categories', array()),

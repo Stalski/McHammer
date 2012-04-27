@@ -188,16 +188,23 @@ class mchammer_mail_template_ui extends ctools_export_ui {
     $cache_key = $this->edit_cache_get_key($form_state['item'], $form_state['form type']);
     $cache = panels_edit_cache_get('mchammer:' . $cache_key);
 
-    $form_state['renderer'] = panels_get_renderer_handler('editor', $cache->display);
+    $form_state['renderer'] = panels_get_renderer_handler('mchammer', $cache->display);
     $form_state['renderer']->cache = &$cache;
 
     $form_state['display'] = &$cache->display;
     $form_state['content_types'] = $cache->content_types;
+
     // Tell the Panels form not to display buttons.
     $form_state['no buttons'] = TRUE;
-    $form_state['display_title'] = !empty($cache->display_title);
+    $form_state['display_title'] = FALSE;
+    $form_state['no preview'] = TRUE;
 
     $form = panels_edit_display_form($form, $form_state);
+
+    // Remove the update button
+    if (isset($form['buttons']['next'])) {
+      unset($form['buttons']['next']);
+    }
 
     // Make sure the theme will work since our form id is different.
     $form['#theme'] = 'panels_edit_display_form';

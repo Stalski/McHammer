@@ -8,6 +8,7 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_mchammer {
   public $mail_template_name = '';
   protected $source_panes = array();
   protected $source_display = NULL;
+  protected $pane_groups = array();
 
   /**
    * Prepare the attached display for rendering.
@@ -79,15 +80,78 @@ class panels_renderer_mchammer_newsletter extends panels_renderer_mchammer {
 
       // Create the links for the modal to re-render the panes.
       $setting = array('mchammer' => array());
-      foreach ($this->display->content as $object) {
-        if (isset($object->configuration['source'])) {
-          $this->pane_groups[$object->configuration['source']] = str_replace(":" , "--", $object->configuration['source']);
+      if (!empty($this->display->content)) {
+        foreach ($this->display->content as $object) {
+          if (isset($object->configuration['source'])) {
+            $this->pane_groups[$object->configuration['source']] = str_replace(":" , "--", $object->configuration['source']);
+          }
         }
+        $setting['mchammer'] = $this->pane_groups;
+        drupal_add_js($setting, 'setting');
       }
-      $setting['mchammer'] = $this->pane_groups;
-      drupal_add_js($setting, 'setting');
     }
 
+  }
+
+  /**
+   * Create a list of categories from all of the content type.
+   *
+   * @return array
+   *   An array of categories. Each entry in the array will also be an array
+   *   with 'title' as the printable title of the category, and 'content'
+   *   being an array of all content in the category. Each item in the 'content'
+   *   array contain the array plugin definition so that it can be later
+   *   found in the content array. They will be keyed by the title so that they
+   *   can be sorted.
+   */
+  function get_categories($content_types) {
+
+    $enabled_categories = array_filter(variable_get('mchammer_panel_categories', array()));
+
+    $categories = array();
+    $category_names = array();
+
+    foreach ($content_types as $type_name => $subtypes) {
+      foreach ($subtypes as $subtype_name => $content_type) {
+        list($category_key, $category) = $this->get_category($content_type);
+
+        $content_title = filter_xss_admin($content_type['title']);
+
+        // If category is not root, check if the category is enabled.
+        if ($category_key != 'root' && !isset($enabled_categories[$category_key])) {
+          continue;
+        }
+        // If category is root, check if the plugin is enabled.
+        elseif ($category_key == 'root' && !isset($enabled_categories[$content_title])) {
+          continue;
+        }
+
+        if (empty($categories[$category_key])) {
+          $categories[$category_key] = array(
+            'title' => $category,
+            'content' => array(),
+          );
+          $category_names[$category_key] = $category;
+        }
+
+        // Ensure content with the same title doesn't overwrite each other.
+        while (isset($categories[$category_key]['content'][$content_title])) {
+          $content_title .= '-';
+        }
+
+        $categories[$category_key]['content'][$content_title] = $content_type;
+        $categories[$category_key]['content'][$content_title]['type_name'] = $type_name;
+        $categories[$category_key]['content'][$content_title]['subtype_name'] = $subtype_name;
+      }
+    }
+
+    // Now sort
+    natcasesort($category_names);
+    foreach ($category_names as $category => $name) {
+      $output[$category] = $categories[$category];
+    }
+
+    return $output;
   }
 
   /**
